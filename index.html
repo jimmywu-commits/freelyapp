@@ -147,6 +147,7 @@ input,select,textarea,button{
 }
 textarea{resize:vertical}
 button{cursor:pointer;background:linear-gradient(135deg,#6ac6ff,#9b8cff);border:0;color:#06101a;font-weight:800}
+button:disabled{cursor:not-allowed;background:#2a2f3d!important;color:#6b7383!important;opacity:.7}
 .secondary{background:#252b39;color:var(--text);border:1px solid var(--line)}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .stageShell{
@@ -327,6 +328,13 @@ button{cursor:pointer;background:linear-gradient(135deg,#6ac6ff,#9b8cff);border:
 @keyframes pulseGreen{0%{border-color:var(--line);box-shadow:0 0 0 rgba(124,240,189,0)}22%{border-color:var(--green);box-shadow:0 0 22px rgba(124,240,189,.55)}100%{border-color:var(--line);box-shadow:0 0 0 rgba(124,240,189,0)}}
 .hint{padding:10px;border-radius:14px;background:rgba(141,211,255,.08);border:1px solid rgba(141,211,255,.25);color:#dce7ff}
 .hidden{display:none}
+.styleRefImgWrap{position:relative;border-radius:10px;overflow:hidden;margin-bottom:6px}
+.styleRefLoadingOverlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  background:rgba(15,17,23,.5);backdrop-filter:blur(10px) saturate(140%);-webkit-backdrop-filter:blur(10px) saturate(140%)}
+.styleRefLoadingOverlay.hidden{display:none}
+.styleRefSpinner{width:32px;height:32px;border-radius:50%;border:3px solid rgba(141,211,255,.25);border-top-color:var(--accent);animation:styleRefSpin .8s linear infinite}
+.styleRefLoadingText{font-size:12px;font-weight:700;color:var(--text);text-align:center;line-height:1.5;padding:0 14px;text-shadow:0 1px 4px rgba(0,0,0,.6);white-space:pre-line}
+@keyframes styleRefSpin{to{transform:rotate(360deg)}}
 .fileDrop{border:1px dashed #4a5266;border-radius:14px;padding:12px;background:#11141c;color:#cfd7e7;text-align:center}
 .fileDrop input{margin-top:8px}
 .productList{max-height:210px;overflow:auto;border:1px solid var(--line);border-radius:14px;padding:8px;background:#11141c}
@@ -1182,16 +1190,26 @@ html,body{height:100%;overflow:hidden}
 <label>已上傳商品</label>
 <div class="productList" id="productList"></div>
 
+<div id="styleRefSection" class="hidden">
 <h2>參考風格圖（選填）</h2>
 <p style="margin:0 0 10px;color:#9aa3b2;font-size:12px;line-height:1.5">上傳一張氛圍/背景參考圖，瀏覽器內建 AI 會自動辨識並產生風格咒語，僅用於背景色調、材質、光影、氛圍 — 不會影響商品大小與位置。</p>
-<button id="openStyleRefUpload" style="background:linear-gradient(135deg,#ffb454,#ff7ac6);margin-bottom:8px">🎨 上傳參考風格圖</button>
+<button id="openStyleRefUpload" disabled style="background:linear-gradient(135deg,#ffb454,#ff7ac6);margin-bottom:4px">🎨 上傳參考風格圖</button>
+<div id="styleRefModelStatus" style="font-size:11px;color:var(--muted);margin-bottom:8px">🧠 AI 模型背景下載中，完成後即可上傳…</div>
 <input id="styleRefInput" type="file" accept="image/*" style="display:none">
 <div id="styleRefStatus" class="hidden" style="font-size:12px;color:#8dd3ff;margin-bottom:6px"></div>
 <div id="styleRefPreviewWrap" class="hidden">
-  <img id="styleRefPreviewImg" style="width:100%;max-height:140px;object-fit:cover;border-radius:10px;border:1px solid var(--line);margin-bottom:6px" alt="參考風格圖預覽">
+  <div class="styleRefImgWrap">
+    <img id="styleRefPreviewImg" style="display:block;width:100%;max-height:140px;object-fit:cover;border-radius:10px;border:1px solid var(--line)" alt="參考風格圖預覽">
+    <div id="styleRefLoadingOverlay" class="styleRefLoadingOverlay hidden">
+      <div class="styleRefSpinner"></div>
+      <div id="styleRefLoadingText" class="styleRefLoadingText">處理中…</div>
+      <button id="styleRefCancelBtn" style="background:#1a1f2e;border:1px solid rgba(255,106,106,.3);color:#ff6a6a;font-weight:700;font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer;margin-top:8px">✕ 取消</button>
+    </div>
+  </div>
   <label>AI 辨識風格咒語（可編輯）</label>
   <textarea id="styleRefTextArea" placeholder="AI 產生的風格描述會顯示在這裡，可自行編輯…" style="min-height:70px"></textarea>
   <button id="styleRefClearBtn" style="background:#1a1f2e;border:1px solid var(--line);color:#ff6b6b;font-weight:700;margin-top:6px">✕ 移除參考圖</button>
+</div>
 </div>
 
 <h2>畫布尺寸</h2>
@@ -1213,38 +1231,40 @@ html,body{height:100%;overflow:hidden}
   </div>
 </div>
 
-<div style="margin:18px 0 0;border-radius:18px;background:linear-gradient(135deg,rgba(124,240,189,.07),rgba(141,211,255,.07));border:1px solid rgba(124,240,189,.18);padding:16px">
-  <div style="font-size:11px;font-weight:900;color:rgba(124,240,189,.8);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">擺品構圖</div>
+<div id="positioningPanel" class="hidden" style="margin:18px 0 0;border-radius:18px;background:linear-gradient(135deg,rgba(124,240,189,.07),rgba(141,211,255,.07));border:1px solid rgba(124,240,189,.18);padding:16px">
+  <div id="positioningControls">
+    <div style="font-size:11px;font-weight:900;color:rgba(124,240,189,.8);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">擺品構圖</div>
 
-  <div style="font-size:11px;font-weight:700;color:#9aa3b2;margin-bottom:8px">構圖模式</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-    <button class="btn-triangle" id="applyTriangle" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 8px">
-      <span style="font-size:13px;font-weight:900">△ 正三角</span>
-      <span style="font-size:10px;font-weight:400;opacity:.72">盒裝・方形・寬體</span>
-    </button>
-    <button class="btn-triangle" id="applyBookend" style="background:linear-gradient(135deg,#ffd166,#f0997b);display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 8px">
-      <span style="font-size:13px;font-weight:900">⊓ 直式V型</span>
-      <span style="font-size:10px;font-weight:400;opacity:.72">瓶裝・細長・香水</span>
-    </button>
-  </div>
-  <button class="btn-shuffle" id="shuffleTriangle" style="width:100%;margin-bottom:14px">⟳ 隨機切換（目前模式）</button>
-
-  <div style="height:1px;background:rgba(255,255,255,.07);margin-bottom:14px"></div>
-
-  <div style="font-size:11px;font-weight:700;color:#9aa3b2;margin-bottom:8px">品項重疊比例</div>
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-    <button id="overlapMinus" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#1a1f2e;color:#8dd3ff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex:0 0 auto;transition:.15s" title="減少重疊">−</button>
-    <div style="flex:1">
-      <input id="overlapSlider" type="range" min="0" max="50" value="10" style="width:100%;accent-color:#8dd3ff;height:4px;cursor:pointer">
-      <div style="display:flex;justify-content:space-between;margin-top:3px">
-        <span style="font-size:10px;color:#6a7892">0% 不重疊</span>
-        <span style="font-size:10px;color:#6a7892">50% 半壓</span>
-      </div>
+    <div style="font-size:11px;font-weight:700;color:#9aa3b2;margin-bottom:8px">構圖模式</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <button class="btn-triangle" id="applyTriangle" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 8px">
+        <span style="font-size:13px;font-weight:900">△ 正三角</span>
+        <span style="font-size:10px;font-weight:400;opacity:.72">盒裝・方形・寬體</span>
+      </button>
+      <button class="btn-triangle" id="applyBookend" style="background:linear-gradient(135deg,#ffd166,#f0997b);display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 8px">
+        <span style="font-size:13px;font-weight:900">⊓ 直式V型</span>
+        <span style="font-size:10px;font-weight:400;opacity:.72">瓶裝・細長・香水</span>
+      </button>
     </div>
-    <button id="overlapPlus" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#1a1f2e;color:#8dd3ff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex:0 0 auto;transition:.15s" title="增加重疊">＋</button>
-    <div id="overlapVal" style="min-width:36px;text-align:center;font-size:13px;font-weight:900;color:#8dd3ff">10%</div>
+    <button class="btn-shuffle" id="shuffleTriangle" style="width:100%;margin-bottom:14px">⟳ 隨機切換（目前模式）</button>
+
+    <div style="height:1px;background:rgba(255,255,255,.07);margin-bottom:14px"></div>
+
+    <div style="font-size:11px;font-weight:700;color:#9aa3b2;margin-bottom:8px">品項重疊比例</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <button id="overlapMinus" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#1a1f2e;color:#8dd3ff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex:0 0 auto;transition:.15s" title="減少重疊">−</button>
+      <div style="flex:1">
+        <input id="overlapSlider" type="range" min="0" max="50" value="10" style="width:100%;accent-color:#8dd3ff;height:4px;cursor:pointer">
+        <div style="display:flex;justify-content:space-between;margin-top:3px">
+          <span style="font-size:10px;color:#6a7892">0% 不重疊</span>
+          <span style="font-size:10px;color:#6a7892">50% 半壓</span>
+        </div>
+      </div>
+      <button id="overlapPlus" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#1a1f2e;color:#8dd3ff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex:0 0 auto;transition:.15s" title="增加重疊">＋</button>
+      <div id="overlapVal" style="min-width:36px;text-align:center;font-size:13px;font-weight:900;color:#8dd3ff">10%</div>
+    </div>
+    <div id="overlapPreviewRow" style="display:flex;gap:6px;margin-top:6px;align-items:flex-end;justify-content:center;height:26px"></div>
   </div>
-  <div id="overlapPreviewRow" style="display:flex;gap:6px;margin-top:6px;align-items:flex-end;justify-content:center;height:26px"></div>
 </div>
 
 <h2>場景風格</h2>
@@ -1340,20 +1360,21 @@ Only generate or adjust:
 <div class="exportRow single"><button id="exportLayout">下載 Layout PNG</button></div>
 <div class="exportRow single"><button id="openSlabGenerator" style="background:linear-gradient(135deg,#ffb35c,#ff7a45);color:#2a1400">開啟 SLAB 生成圖片</button></div>
 <div class="exportRow single"><button class="secondary" id="uploadEditOriginalBtn">上傳編輯原始檔</button></div>
-<div class="downloadNote">點擊「下載 Layout PNG」會自動依序下載 Layout 參考圖＋「編輯原始檔.json」（畫布上商品圖片、位置、大小的完整暫存）＋每一張你上傳的商品原圖（各自獨立檔案，不會打包成 ZIP）。請將這些檔案與完整 Prompt 一起上傳到生成工具。Layout PNG 用來鎖定比例、位置與構圖；「編輯原始檔.json」可以透過上方「上傳編輯原始檔」按鈕還原回畫布繼續編輯。</div>
+<div class="downloadNote">點擊「下載 Layout PNG」會自動依序下載 Layout 參考圖＋「編輯原始檔.json」（畫布上商品圖片、位置、大小的完整暫存）＋每一張你上傳的商品原圖＋（若有上傳參考風格圖）參考風格圖本身，檔名為「REF-STYLE-參考圖」（各自獨立檔案，不會打包成 ZIP）。請將這些檔案與完整 Prompt 一起上傳到生成工具。Layout PNG 與商品原圖用來鎖定比例、位置與構圖，優先權最高；參考風格圖僅供背景氛圍參考，優先權最低，Prompt 中已註明不可影響商品大小、位置與方向。「編輯原始檔.json」可以透過上方「上傳編輯原始檔」按鈕還原回畫布繼續編輯。</div>
 <div style="margin-top:10px;background:rgba(141,211,255,.06);border:1px solid rgba(141,211,255,.18);border-radius:12px;padding:12px 14px;font-size:12px;color:#9aa3b2;line-height:1.8">
   <div style="font-size:11px;font-weight:900;color:#8dd3ff;margin-bottom:6px;letter-spacing:.04em">正確使用流程</div>
   <b style="color:#dce7ff">ChatGPT (GPT-4o)</b><br>
   1. 下載 Layout PNG<br>
   2. 複製 Prompt<br>
-  3. 在 GPT-4o 對話框上傳：Layout PNG ＋ 所有商品原圖（必須一起上傳）<br>
+  3. 在 GPT-4o 對話框上傳：Layout PNG ＋ 所有商品原圖（必須一起上傳）＋參考風格圖（若有，選填）<br>
   4. 貼上 Prompt 送出<br>
   <div style="margin-top:8px"><b style="color:#dce7ff">Gemini (Imagen 3)</b></div>
   1. 下載 Layout PNG<br>
   2. 複製 Prompt<br>
-  3. 在 Gemini 上傳：Layout PNG ＋ 所有商品原圖<br>
+  3. 在 Gemini 上傳：Layout PNG ＋ 所有商品原圖 ＋參考風格圖（若有，選填）<br>
   4. 貼上 Prompt 送出<br>
   <div style="margin-top:8px;color:#ffd166">⚠ 商品原圖必須附上，AI 才能精確比對商品外觀。只貼 Prompt 不上傳圖片，AI 會自行生成相似但不正確的商品。</div>
+  <div style="margin-top:8px;color:#8dd3ff">ℹ 參考風格圖僅供背景氛圍參考，Prompt 已註明其優先權最低，不會影響商品大小、位置、方向；商品原圖與 Layout PNG 才是鎖定商品外觀與構圖的依據。</div>
 </div></div>
 </section>
 </div>
@@ -1362,6 +1383,20 @@ Only generate or adjust:
 const stage=document.getElementById('stage'), out=document.getElementById('out'), productList=document.getElementById('productList'), multiUpload=document.getElementById('multiUpload');
 let active=null, drag=null, idSeq=0, selectedScene=0, selectedPurpose=0;
 const productOriginalFiles=new Map(); // productId -> original uploaded File (for Layout PNG + originals download)
+let styleRefFile=null; // the uploaded reference-style image File (for Layout PNG batch download), cleared alongside styleRefClearBtn
+let _styleRefCanceled=false; // flag to cancel ongoing AI captioning
+
+// 參考風格圖功能預設隱形，僅在網址加上 #2 時顯示（測試用）
+(function syncStyleRefSectionVisibility(){
+  const section = document.getElementById('styleRefSection');
+  if(!section) return;
+  const show = location.hash === '#2';
+  section.classList.toggle('hidden', !show);
+})();
+window.addEventListener('hashchange', () => {
+  const section = document.getElementById('styleRefSection');
+  if(section) section.classList.toggle('hidden', location.hash !== '#2');
+});
 
 // Each scene fixes backdrop color/material/light ONLY. How many decorative elements
 // actually appear is controlled exclusively by the BACKGROUND ELEMENTS (purposes) section
@@ -1534,13 +1569,18 @@ function getPurposeText(){
 function getStyleRefText(){
   const ta=document.getElementById('styleRefTextArea');
   const txt=ta?ta.value.trim():'';
-  if(!txt) return '';
-  return `
-REFERENCE STYLE IMAGE — BACKGROUND MOOD INSPIRATION ONLY
-A separate reference image was uploaded solely for background style inspiration. AI-detected style keywords: "${txt}"
-Use this ONLY to inform background color palette, background material/texture, lighting mood, and atmosphere.
-This reference image is NOT a layout reference and MUST NOT influence product size, product position, product scale, product count, product rotation, product cropping, camera distance, or composition in any way — every product placement rule above remains the single source of truth for layout.
-`;
+  if(!txt && !styleRefFile) return '';
+  const fileName=styleRefFile?styleRefDownloadName():'';
+  const lines=['REFERENCE STYLE IMAGE — BACKGROUND MOOD INSPIRATION ONLY, LOWEST PRIORITY INPUT'];
+  lines.push(styleRefFile
+    ? `A separate reference image file (attached alongside the product images and Layout PNG, filename "${fileName}") was uploaded solely for background style inspiration.`
+    : 'A separate reference image was uploaded solely for background style inspiration.');
+  if(txt) lines.push(`AI-detected style keywords: "${txt}"`);
+  lines.push('Use this ONLY to inform background color palette, background material/texture, lighting mood, and atmosphere.');
+  lines.push('This reference image/text is NOT a layout reference and NOT a product reference. It MUST NOT influence product size, product position, product scale, product count, product rotation, product cropping, product shape, product orientation, camera distance, or composition in any way.');
+  lines.push('PRIORITY ORDER (non-negotiable): the uploaded product images and the Layout PNG are the ABSOLUTE top-priority source of truth — every product must stay 100% identical to its original uploaded photo: same size, same proportions, same orientation, never flipped, mirrored, rotated, redrawn, or regenerated. This style reference (image and/or text) is the LOWEST-priority input in this entire prompt and can NEVER override, soften, or take precedence over any product-preservation or placement rule stated above.');
+  if(styleRefFile) lines.push(`If "${fileName}" itself contains any object, product, person, or shape, completely IGNORE that content — do not copy, blend, merge, morph, or let it influence the uploaded products in any way. Extract ONLY abstract background qualities from it: color palette, lighting mood, material/texture, atmosphere.`);
+  return '\n'+lines.join('\n')+'\n';
 }
 function markUpdated(){out.classList.remove('updated');void out.offsetWidth;out.classList.add('updated')}
 let _refreshing = false;
@@ -2281,51 +2321,254 @@ ultra realistic, premium studio photography, ${aspectDesc} ${selectedCanvasRatio
 multiUpload.addEventListener('change',e=>{[...e.target.files].forEach(file=>addProductFromFile(file));multiUpload.value='';markUpdated()});
 
 // ── Reference style image → in-browser AI caption ("咒語") ──
-// Genuine client-side image captioning via Transformers.js (WASM/WebGPU) — no backend,
-// no API key. Loaded lazily from a CDN on first use and cached as a singleton pipeline
-// so re-uploading a second reference image doesn't redownload the model.
-let _captionerPipelinePromise = null;
-function getCaptionerPipeline(){
-  if(!_captionerPipelinePromise){
-    _captionerPipelinePromise = import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2')
-      .then(({pipeline}) => pipeline('image-to-text', 'Xenova/vit-gpt2-image-captioning'));
+// Genuine client-side vision-language captioning via Transformers.js (WASM/WebGPU) — no
+// backend, no API key. Uses Florence-2 (not a plain image-captioning model): its
+// "<MORE_DETAILED_CAPTION>" task is prompt-driven and returns multi-sentence descriptions
+// that actually name colors, materials, lighting and background elements, instead of the
+// single flat generic sentence a small captioning model like vit-gpt2 produces.
+// Everything model-related (the ~350MB download, the object-detection mask pass, and the
+// captioning pass — both beam-search generate() calls) runs inside a dedicated Web Worker
+// (CAPTIONER_WORKER_SRC below, loaded from a Blob URL so the app stays a single file). That
+// keeps this heavy WASM compute off the main thread entirely, so the canvas, drag handles
+// and every other control stay responsive while it runs — previously this all ran inline on
+// the main thread and could visibly freeze the page during the two inference passes.
+const STYLE_LIB_URL = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.5';
+const CAPTIONER_WORKER_SRC = [
+  "const STYLE_MODEL_ID = 'onnx-community/Florence-2-base-ft';",
+  "const STYLE_LIB_URL = " + JSON.stringify(STYLE_LIB_URL) + ";",
+  "const STYLE_CAPTION_TASK = '<MORE_DETAILED_CAPTION>';",
+  "const STYLE_INPUT_MAX = 768;", // matches Florence-2's native 768×768 input
+  "let _hfModulePromise = null;",
+  "function getHFModule(){",
+  "  if(!_hfModulePromise) _hfModulePromise = import(STYLE_LIB_URL);",
+  "  return _hfModulePromise;",
+  "}",
+  "let _captionerPipelinePromise = null;",
+  "function getCaptionerPipeline(){",
+  "  if(!_captionerPipelinePromise){",
+  "    postMessage({ type: 'model-status', state: 'loading' });",
+  "    _captionerPipelinePromise = getHFModule().then(async ({ Florence2ForConditionalGeneration, AutoProcessor, AutoTokenizer }) => {",
+  "      const [model, processor, tokenizer] = await Promise.all([",
+  "        Florence2ForConditionalGeneration.from_pretrained(STYLE_MODEL_ID, {",
+  "          dtype: { embed_tokens: 'fp16', vision_encoder: 'fp16', encoder_model: 'q4', decoder_model_merged: 'q4' },",
+  "        }),",
+  "        AutoProcessor.from_pretrained(STYLE_MODEL_ID),",
+  "        AutoTokenizer.from_pretrained(STYLE_MODEL_ID),",
+  "      ]);",
+  "      return { model, processor, tokenizer };",
+  "    });",
+  "    _captionerPipelinePromise.then(",
+  "      () => { postMessage({ type: 'model-status', state: 'ready' }); },",
+  "      (err) => {",
+  "        console.error('Florence-2 model load failed', err);",
+  "        _captionerPipelinePromise = null;",
+  "        postMessage({ type: 'model-status', state: 'error' });",
+  "      }",
+  "    );",
+  "  }",
+  "  return _captionerPipelinePromise;",
+  "}",
+  "function canvasToDataURL(canvas, type, quality){",
+  "  return canvas.convertToBlob({ type, quality }).then((blob) => new Promise((resolve, reject) => {",
+  "    const reader = new FileReader();",
+  "    reader.onload = () => resolve(reader.result);",
+  "    reader.onerror = reject;",
+  "    reader.readAsDataURL(blob);",
+  "  }));",
+  "}",
+  "function scaleImageToCanvas(bitmap, max){",
+  "  const iw = bitmap.width, ih = bitmap.height;",
+  "  const scale = Math.min(1, max / Math.max(iw, ih));",
+  "  const w = Math.max(1, Math.round(iw * scale));",
+  "  const h = Math.max(1, Math.round(ih * scale));",
+  "  const canvas = new OffscreenCanvas(w, h);",
+  "  canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);",
+  "  return canvas;",
+  "}",
+  "async function detectSubjectBox(scaledCanvas, RawImage, model, processor, tokenizer){",
+  "  try{",
+  "    const task = '<OD>';",
+  "    const dataUrl = await canvasToDataURL(scaledCanvas, 'image/jpeg', 0.9);",
+  "    const image = await RawImage.fromURL(dataUrl);",
+  "    const vision_inputs = await processor(image);",
+  "    const text_inputs = tokenizer(processor.construct_prompts(task));",
+  "    const generated_ids = await model.generate({",
+  "      ...text_inputs, ...vision_inputs, max_new_tokens: 256, num_beams: 3, do_sample: false,",
+  "    });",
+  "    const generated_text = tokenizer.batch_decode(generated_ids, { skip_special_tokens: false })[0];",
+  "    const od = processor.post_process_generation(generated_text, task, image.size)?.[task];",
+  "    if(!od?.bboxes?.length) return null;",
+  "    const w = scaledCanvas.width, h = scaledCanvas.height;",
+  "    let best = null, bestArea = 0;",
+  "    od.bboxes.forEach(([x1, y1, x2, y2]) => {",
+  "      const area = Math.max(0, x2 - x1) * Math.max(0, y2 - y1);",
+  "      if(area > bestArea && area < w * h * 0.85){ bestArea = area; best = [x1, y1, x2, y2]; }",
+  "    });",
+  "    return best;",
+  "  }catch(err){",
+  "    console.warn('subject detection failed, using fallback centered mask', err);",
+  "    return null;",
+  "  }",
+  "}",
+  "async function maskCanvasWithBox(canvas, box){",
+  "  const w = canvas.width, h = canvas.height;",
+  "  let left, top, right, bottom;",
+  "  if(box){",
+  "    const [x1, y1, x2, y2] = box;",
+  "    const padX = (x2 - x1) * 0.25, padY = (y2 - y1) * 0.25;",
+  "    left = Math.max(0, x1 - padX); top = Math.max(0, y1 - padY);",
+  "    right = Math.min(w, x2 + padX); bottom = Math.min(h, y2 + padY);",
+  "  }else{",
+  "    left = w * 0.18; right = w * 0.82; top = h * 0.12; bottom = h * 0.88;",
+  "  }",
+  "  const blurCanvas = new OffscreenCanvas(w, h);",
+  "  const bctx = blurCanvas.getContext('2d');",
+  "  bctx.filter = 'blur(' + Math.max(10, Math.round(Math.min(w, h) * 0.16)) + 'px)';",
+  "  bctx.drawImage(canvas, 0, 0);",
+  "  const out = new OffscreenCanvas(w, h);",
+  "  const ctx = out.getContext('2d');",
+  "  ctx.drawImage(canvas, 0, 0);",
+  "  ctx.save();",
+  "  ctx.beginPath();",
+  "  ctx.rect(left, top, right - left, bottom - top);",
+  "  ctx.clip();",
+  "  ctx.drawImage(blurCanvas, 0, 0);",
+  "  ctx.fillStyle = 'rgba(128,128,128,0.35)';",
+  "  ctx.fillRect(left, top, right - left, bottom - top);",
+  "  ctx.restore();",
+  "  return canvasToDataURL(out, 'image/jpeg', 0.85);",
+  "}",
+  "function cleanCaption(text){",
+  "  if(!text) return text;",
+  "  let t = text",
+  "    .replace(/^\\s*(the image shows|this image shows|the image depicts|in this image,?|the image is of|the image contains)\\s*/i, '')",
+  "    .replace(/\\s+/g, ' ')",
+  "    .trim();",
+  "  const sentences = t.split(/(?<=[.!?])\\s+/).filter(Boolean);",
+  "  const seen = new Set();",
+  "  const kept = [];",
+  "  for(const s of sentences){",
+  "    if(/\\bblur(ry|red)?\\b/i.test(s)) continue;",
+  "    const key = s.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();",
+  "    if(!key || key.length < 4 || seen.has(key)) continue;",
+  "    seen.add(key);",
+  "    kept.push(s.trim());",
+  "  }",
+  "  t = kept.join(' ').trim();",
+  "  return t ? t.charAt(0).toUpperCase() + t.slice(1) : text;",
+  "}",
+  "async function captionImage(bitmap){",
+  "  const [{ RawImage }, { model, processor, tokenizer }] = await Promise.all([getHFModule(), getCaptionerPipeline()]);",
+  "  const scaled = scaleImageToCanvas(bitmap, STYLE_INPUT_MAX);",
+  "  const box = await detectSubjectBox(scaled, RawImage, model, processor, tokenizer);",
+  "  const maskedDataUrl = await maskCanvasWithBox(scaled, box);",
+  "  const task = STYLE_CAPTION_TASK;",
+  "  const image = await RawImage.fromURL(maskedDataUrl);",
+  "  const vision_inputs = await processor(image);",
+  "  const text_inputs = tokenizer(processor.construct_prompts(task));",
+  "  const generated_ids = await model.generate({",
+  "    ...text_inputs, ...vision_inputs,",
+  "    max_new_tokens: 220, num_beams: 3, do_sample: false,",
+  "    repetition_penalty: 1.4, no_repeat_ngram_size: 3,",
+  "  });",
+  "  const generated_text = tokenizer.batch_decode(generated_ids, { skip_special_tokens: false })[0];",
+  "  const result = processor.post_process_generation(generated_text, task, image.size);",
+  "  const raw = ((result && result[task]) || '').trim();",
+  "  return cleanCaption(raw);",
+  "}",
+  "self.onmessage = async (e) => {",
+  "  const msg = e.data;",
+  "  if(msg.type === 'preload'){ getCaptionerPipeline().catch(() => {}); return; }",
+  "  if(msg.type === 'caption'){",
+  "    try{",
+  "      const caption = await captionImage(msg.bitmap);",
+  "      postMessage({ type: 'result', id: msg.id, caption });",
+  "    }catch(err){",
+  "      postMessage({ type: 'error', id: msg.id, message: (err && err.message) || String(err) });",
+  "    }",
+  "  }",
+  "};",
+].join('\n');
+let _captionerWorker = null;
+let _captionerReady = false;
+let _captionReqId = 0;
+const _pendingCaptionRequests = new Map(); // id -> {resolve, reject}
+function handleCaptionerWorkerMessage(e){
+  const msg = e.data;
+  if(msg.type === 'model-status'){
+    if(msg.state === 'ready') _captionerReady = true;
+    setStyleRefModelUI(msg.state);
+  } else if(msg.type === 'result'){
+    const p = _pendingCaptionRequests.get(msg.id);
+    if(p){ _pendingCaptionRequests.delete(msg.id); p.resolve(msg.caption); }
+  } else if(msg.type === 'error'){
+    const p = _pendingCaptionRequests.get(msg.id);
+    if(p){ _pendingCaptionRequests.delete(msg.id); p.reject(new Error(msg.message)); }
   }
-  return _captionerPipelinePromise;
 }
-// vit-gpt2-image-captioning has no text-prompt/conditioning input — it always captions
-// whatever it's given — so the only way to steer it away from naming the product sitting
-// in the middle of a reference photo is to heavily blur a generous centered region of the
-// image BEFORE captioning. The (unmodified) original still shows in the preview above;
-// only this blurred copy goes to the AI, biasing its caption toward the surrounding
-// backdrop/props/color palette/mood instead of the product itself.
-function buildCaptionInputImage(imgEl){
-  const MAX = 384;
-  const iw = imgEl.naturalWidth || imgEl.width;
-  const ih = imgEl.naturalHeight || imgEl.height;
-  const scale = Math.min(1, MAX / Math.max(iw, ih));
-  const w = Math.max(1, Math.round(iw * scale));
-  const h = Math.max(1, Math.round(ih * scale));
-
-  const blurCanvas = document.createElement('canvas');
-  blurCanvas.width = w; blurCanvas.height = h;
-  const bctx = blurCanvas.getContext('2d');
-  bctx.filter = `blur(${Math.max(8, Math.round(Math.min(w, h) * 0.14))}px)`;
-  bctx.drawImage(imgEl, 0, 0, w, h);
-
-  const canvas = document.createElement('canvas');
-  canvas.width = w; canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(imgEl, 0, 0, w, h);
-  const left = w * 0.18, right = w * 0.82, top = h * 0.12, bottom = h * 0.88;
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(left, top, right - left, bottom - top);
-  ctx.clip();
-  ctx.drawImage(blurCanvas, 0, 0);
-  ctx.restore();
-
-  return canvas.toDataURL('image/jpeg', 0.85);
+function getCaptionerWorker(){
+  if(!_captionerWorker){
+    const blob = new Blob([CAPTIONER_WORKER_SRC], { type: 'text/javascript' });
+    _captionerWorker = new Worker(URL.createObjectURL(blob), { type: 'module' });
+    _captionerWorker.addEventListener('message', handleCaptionerWorkerMessage);
+    _captionerWorker.addEventListener('error', (err) => {
+      console.error('captioner worker error', err);
+      setStyleRefModelUI('error');
+    });
+  }
+  return _captionerWorker;
 }
+// bitmap is an ImageBitmap, transferred into the worker (main thread loses ownership of it).
+function requestCaption(bitmap){
+  return new Promise((resolve, reject) => {
+    const id = ++_captionReqId;
+    _pendingCaptionRequests.set(id, { resolve, reject });
+    getCaptionerWorker().postMessage({ type: 'caption', id, bitmap }, [bitmap]);
+  });
+}
+// Keeps the "上傳參考風格圖" button disabled/greyed-out (and the status line under it in
+// sync) while the ~350MB model is downloading in the background, so the user isn't left
+// clicking a button that then hangs for a long first-time load — the button only lights up
+// once the model is actually ready to run.
+function setStyleRefModelUI(state){
+  const btn = document.getElementById('openStyleRefUpload');
+  const statusEl = document.getElementById('styleRefModelStatus');
+  if(!btn || !statusEl) return;
+  if(state === 'loading'){
+    btn.disabled = true;
+    statusEl.textContent = '🧠 AI 模型背景下載中，完成後即可上傳…';
+    statusEl.style.color = 'var(--muted)';
+  }else if(state === 'ready'){
+    btn.disabled = false;
+    statusEl.textContent = '✅ AI 模型已就緒，可以上傳參考風格圖了';
+    statusEl.style.color = 'var(--green)';
+  }else if(state === 'error'){
+    btn.disabled = false;
+    statusEl.textContent = '⚠️ AI 模型下載失敗，點擊上傳時會自動重試';
+    statusEl.style.color = '#ff8a8a';
+  }
+}
+// Uploading a reference photo implies the user wants THAT look, not one of the preset
+// scenes — so once a caption is generated, switch 場景風格 to 自訂場景 and pipe the caption
+// straight into its textarea, exactly as if the user had typed it there themselves.
+function applyCaptionToCustomScene(caption){
+  const customIdx = scenes.findIndex(s => s[0] === 'custom');
+  if(customIdx < 0) return;
+  const card = document.querySelector(`.optionCard[data-type="scene"][data-i="${customIdx}"]`);
+  if(card) card.click(); // reuses the existing selection logic (renderCards/updateCustomVisibility/leftChanged)
+  const cs = document.getElementById('customScene');
+  if(cs){
+    cs.value = caption;
+    cs.dispatchEvent(new Event('input', {bubbles:true}));
+  }
+  const mobCs = document.getElementById('mobCustomSceneInput');
+  if(mobCs) mobCs.value = caption;
+}
+// Warm the model cache in the background as soon as the page is idle, instead of waiting
+// for the user's first upload to trigger the ~350MB download.
+if('requestIdleCallback' in window) requestIdleCallback(() => getCaptionerWorker().postMessage({ type: 'preload' }), { timeout: 4000 });
+else setTimeout(() => getCaptionerWorker().postMessage({ type: 'preload' }), 1500);
+
 document.getElementById('openStyleRefUpload')?.addEventListener('click', () => {
   document.getElementById('styleRefInput')?.click();
 });
@@ -2333,36 +2576,59 @@ document.getElementById('styleRefInput')?.addEventListener('change', async e => 
   const file = e.target.files[0];
   e.target.value = '';
   if(!file) return;
-  const wrap   = document.getElementById('styleRefPreviewWrap');
-  const img    = document.getElementById('styleRefPreviewImg');
-  const status = document.getElementById('styleRefStatus');
-  const ta     = document.getElementById('styleRefTextArea');
+  styleRefFile = file;
+  const wrap    = document.getElementById('styleRefPreviewWrap');
+  const img     = document.getElementById('styleRefPreviewImg');
+  const overlay = document.getElementById('styleRefLoadingOverlay');
+  const loadTxt = document.getElementById('styleRefLoadingText');
+  const status  = document.getElementById('styleRefStatus');
+  const ta      = document.getElementById('styleRefTextArea');
   img.src = URL.createObjectURL(file);
   wrap.classList.remove('hidden');
-  status.classList.remove('hidden');
-  status.textContent = '📷 處理圖片中…';
+  status.classList.add('hidden');
+  overlay.classList.remove('hidden');
+  loadTxt.textContent = '📷 處理圖片中…';
   ta.value = '';
   try{
-    await new Promise((resolve, reject) => {
-      if(img.complete && img.naturalWidth) resolve();
-      else { img.onload = resolve; img.onerror = reject; }
-    });
-    const captionInput = buildCaptionInputImage(img);
-    status.textContent = '🧠 瀏覽器內建 AI 辨識中（第一次使用需下載模型，約需數十秒）…';
-    const captioner = await getCaptionerPipeline();
-    const result = await captioner(captionInput);
-    const caption = (result && result[0] && result[0].generated_text || '').trim();
-    ta.value = caption;
-    status.textContent = caption ? '✅ AI 辨識完成（僅描述週邊風格/用色/情境，已略過中間商品），可自行編輯下方描述' : '⚠️ 辨識結果為空，請手動輸入風格描述';
+    _styleRefCanceled = false;
+    const bitmap = await createImageBitmap(file);
+    loadTxt.textContent = _captionerReady
+      ? '🧠 AI 辨識中…'
+      : '🧠 AI 辨識中\n（首次使用需下載模型，約 350MB，\n依網速需數十秒至數分鐘，之後會快取）';
+    const caption = await requestCaption(bitmap);
+    // If user clicked cancel, hide overlay and don't update UI
+    if(_styleRefCanceled){
+      overlay.classList.add('hidden');
+    } else {
+      ta.value = caption;
+      overlay.classList.add('hidden');
+      status.classList.remove('hidden');
+      status.textContent = caption ? '✅ AI 辨識完成（僅描述週邊風格/用色/情境，已略過中間商品），可自行編輯下方描述' : '⚠️ 辨識結果為空，請手動輸入風格描述';
+      if(caption) applyCaptionToCustomScene(caption);
+    }
   }catch(err){
     console.error('style ref captioning failed', err);
-    status.textContent = '⚠️ AI 模型載入失敗（可能離線或瀏覽器不支援），請手動輸入風格描述';
+    if(!_styleRefCanceled){
+      overlay.classList.add('hidden');
+      status.classList.remove('hidden');
+      status.textContent = '⚠️ AI 模型載入失敗（可能離線或瀏覽器不支援），請手動輸入風格描述';
+    } else {
+      overlay.classList.add('hidden');
+    }
   }
   leftChanged();
 });
+document.getElementById('styleRefCancelBtn')?.addEventListener('click', () => {
+  _styleRefCanceled = true;
+  document.getElementById('styleRefLoadingOverlay')?.classList.add('hidden');
+});
+
 document.getElementById('styleRefClearBtn')?.addEventListener('click', () => {
+  styleRefFile = null;
+  _styleRefCanceled = false;
   document.getElementById('styleRefPreviewWrap')?.classList.add('hidden');
   document.getElementById('styleRefStatus')?.classList.add('hidden');
+  document.getElementById('styleRefLoadingOverlay')?.classList.add('hidden');
   const ta = document.getElementById('styleRefTextArea'); if(ta) ta.value = '';
   const img = document.getElementById('styleRefPreviewImg'); if(img) img.src = '';
   leftChanged();
@@ -2422,7 +2688,33 @@ async function exportLayoutPNG(){
     a.click();
     downloadLayoutStateFile('編輯原始檔.json');
     await downloadProductOriginals();
+    await downloadStyleRefImage();
   }
+}
+
+// The reference-style image's download filename — shared between the batch download and
+// the prompt text (getStyleRefText) so the prompt can name the exact attached file.
+function styleRefDownloadName(){
+  if(!styleRefFile) return '';
+  const ext=(styleRefFile.name.match(/\.[^/.]+$/)||['.jpg'])[0];
+  return `REF-STYLE-參考圖${ext}`;
+}
+
+// Downloads the uploaded reference-style image (if any) right after the product originals,
+// so it travels together with Layout PNG + products into the generation tool.
+async function downloadStyleRefImage(){
+  if(!styleRefFile) return;
+  const href=URL.createObjectURL(styleRefFile);
+  const filename=styleRefDownloadName();
+  await new Promise(resolve=>{
+    setTimeout(()=>{
+      const a=document.createElement('a');
+      a.href=href; a.download=filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(href), 15000);
+      resolve();
+    }, 350);
+  });
 }
 
 // Downloads the original uploaded product images (one file per product, no zip) right after
@@ -2475,15 +2767,6 @@ async function exportLayoutPNGDataUrl(){
   bg.addColorStop(1,'#eef2f7');
   ctx.fillStyle=bg;
   ctx.fillRect(0,0,OUTPUT_W,OUTPUT_H);
-
-  // Floor ellipse
-  ctx.fillStyle='rgba(255,255,255,.94)';
-  ctx.beginPath();
-  ctx.ellipse(OUTPUT_W*.5,OUTPUT_H*.82,OUTPUT_W*.32,OUTPUT_H*.095,0,0,Math.PI*2);
-  ctx.fill();
-  ctx.strokeStyle='rgba(0,0,0,.10)';
-  ctx.lineWidth=2;
-  ctx.stroke();
 
   // Guides
   ctx.setLineDash([8,6]);
@@ -3107,7 +3390,12 @@ setTimeout(()=>{
   }
   function closeModal(){ modal.classList.remove('show'); }
 
-  openBtn.addEventListener('click', openModal);
+  openBtn.addEventListener('click', () => {
+    // Skip the first step (preview grid) — go directly to file picker,
+    // and jump to step 2 (size/ratio confirmation) after selection.
+    window._skipToStep2 = true;
+    fileInput.click();
+  });
   closeBtn.addEventListener('click', closeModal);
   modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
 
@@ -3119,11 +3407,19 @@ setTimeout(()=>{
     const files = [...e.dataTransfer.files];
     if(files.length) handleFiles(files);
   });
-  fileInput.addEventListener('change', e=>{
+  fileInput.addEventListener('change', async e=>{
     const files = [...e.target.files];
     fileInput.value = '';
     if(!files.length) return;
-    handleFiles(files);
+    const skipToStep2 = window._skipToStep2;
+    window._skipToStep2 = false;
+    await handleFiles(files);
+    if(skipToStep2 && stagedFiles.length > 0){
+      // Skip step 1; go straight to modal at step 2 (size/ratio confirmation)
+      rankOrder = null; currentStep = 2;
+      modal.classList.add('show');
+      initRankOrder(); renderRankRow(); showStep(2);
+    }
   });
 
   async function handleFiles(files){
@@ -3600,10 +3896,17 @@ function _applyTriangleLayoutCore(productEls, variantIdx, keepSize){
     productEls.forEach((el, i) => {
       const w = unit * mult[i] * scale;
       const h = w / ratios[i];
-      el.style.left   = pct(x)             + '%';
-      el.style.top    = pct(baselineY - h) + '%';
-      el.style.width  = pct(w)             + '%';
-      el.style.height = pct(h)             + '%';
+      // The middle product of a 3-product row is vertically centered in the safe zone
+      // (equal whitespace above/below) instead of bottom-aligned to the shared baseline,
+      // so it sits deeper/lower than left/right and creates a deliberate height difference.
+      const isMiddleOfThree = n === 3 && i === 1;
+      const top = isMiddleOfThree
+        ? sz.top + ((sz.bottom - sz.top) - h) / 2
+        : baselineY - h;
+      el.style.left   = pct(x)   + '%';
+      el.style.top    = pct(top) + '%';
+      el.style.width  = pct(w)   + '%';
+      el.style.height = pct(h)   + '%';
       el.dataset.defaultRotation = defaultRot[i];
       setProductRotation(el, defaultRot[i]);
       x += w;
