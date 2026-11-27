@@ -590,6 +590,9 @@ button:disabled{cursor:not-allowed;background:#2a2f3d!important;color:#6b7383!im
   font-weight:900;
   white-space:nowrap;
 }
+.aiBaseRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.aiBaseRow button{padding:10px 8px;font-size:13px}
+.promptPanel.mode-strict .aiBaseRow{display:none}
 .exportRow{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -1428,7 +1431,7 @@ html,body{height:100%;overflow:hidden}
 <p id="layoutStatus" role="status" style="font-size:12px;color:#8dd3ff;line-height:1.6"></p><textarea id="out" class="output" readonly></textarea>
 <div class="promptActions"><button id="copy" class="copyBtn">複製 Prompt</button>
 <div id="strictComposite" class="strictBox strictOnly">
-  <div class="strictStep"><b>②</b><div>到 SLAB（或 Gemini）選 <span class="strictRatio">1:1</span> 比例，貼上咒語生成。<b>不需要上傳商品圖</b>，AI 只畫背景。
+  <div class="strictStep"><b>②</b><div>到 SLAB（或 Gemini）選 <span class="strictRatio">1:1</span> 比例，貼上咒語生成。<b>不要附加任何圖片</b>（商品圖、構圖圖都不用，附了反而容易畫出空白看板），AI 只畫背景；商品會在下一步貼回背景時由本工具放上去。
     <button type="button" class="secondary" id="openSlabStrict" style="margin-top:6px">開啟 SLAB</button></div></div>
   <div class="strictStep"><b>③</b><div>把生成的背景貼回來
     <div id="bgDropZone" class="bgDropZone" tabindex="0" aria-label="貼上或拖曳背景圖">
@@ -1446,18 +1449,21 @@ html,body{height:100%;overflow:hidden}
   <button type="button" class="secondary" id="refreshComposite">更新合成預覽（改過排版後按）</button>
   <button id="downloadComposite" disabled style="margin-top:8px">⑤ 下載成品 PNG</button>
 </div>
+<div class="aiOnly aiBaseRow">
+  <button type="button" class="secondary" id="copyLayoutBase" title="複製後到 SLAB 的上傳區按 Ctrl+V；SLAB 只附加這一張">📋 複製排版底圖</button>
+  <button type="button" class="secondary" id="downloadLayoutBase">⬇ 下載排版底圖</button>
+</div>
 <div class="exportRow single"><button id="exportLayout">下載生成素材 ZIP</button></div>
 <div class="exportRow single"><button id="openSlabGenerator" style="background:linear-gradient(135deg,#ffb35c,#ff7a45);color:#2a1400">開啟 SLAB 生成圖片</button></div>
 <div class="exportRow single"><button class="secondary" id="uploadEditOriginalBtn">上傳編輯原始檔</button></div>
 <div class="downloadNote">ZIP 內含兩種模式的咒語、乾淨構圖圖、標註圖、REF 商品 PNG、排版規格、編輯原始檔及原圖備份。<b class="strictOnly" style="color:#7cf0bd">嚴格模式只需要背景咒語，不必上傳任何圖給 AI。</b>不要混用不同次下載的素材與咒語。自動裁邊不等於去背，請盡量使用透明背景商品 PNG。</div>
 <div class="aiOnly" style="margin-top:10px;background:rgba(141,211,255,.06);border:1px solid rgba(141,211,255,.18);border-radius:12px;padding:12px 14px;font-size:12px;color:#9aa3b2;line-height:1.8">
   <b style="color:#dce7ff">AI 融合模式流程</b><br>
-  1. 完成排版與背景選項，下載素材 ZIP 並解壓縮。<br>
-  2. 上傳 layout-clean、layout-reference 與所有 REF-xx-product.png；有 REF-STYLE 時可一併附上。<br>
-  3. 貼上 ZIP 內的 prompt.txt。layout-spec.json 可作為數值備查，originals 資料夾不用重複上傳。<br>
-  4. 核對位置、占比、旋轉、文字與商品數量。AI 不保證逐像素遵守咒語。<br>
-  「編輯原始檔.json」只供本工具還原；不是給 AI 的圖片。<br>
-  需要包裝、文字、Logo 完全不變時，請改用<b style="color:#7cf0bd">嚴格模式</b>。
+  1. 按「複製排版底圖」或「下載排版底圖」，在 SLAB <b style="color:#dce7ff">只附加這一張</b>。它是要 AI 修改的照片，商品的位置、大小、角度都以它為準。<br>
+  2. <b style="color:#ffd166">不要再附加商品原圖或 layout-reference 標註圖</b>：多附圖片，AI 會改成「重組畫面」，商品就容易被縮放、轉向或重畫。<br>
+  3. 比例選 <span class="strictRatio">1:1</span>（和畫布相同，否則 AI 會重新構圖），貼上咒語生成。模型建議先試 Gemini 2.5 Flash（SLAB 標示 Preserves details while editing，修圖時較會保留原圖），再和 3 Pro 比較。<br>
+  4. 核對商品的位置、大小、角度、文字和數量。咒語能大幅降低變動，但無法百分之百保證。<br>
+  需要包裝、文字、Logo 絕對不變時，可改用<b style="color:#7cf0bd">嚴格模式</b>。
 </div></div>
 </section>
 </div>
@@ -1465,15 +1471,16 @@ html,body{height:100%;overflow:hidden}
 <script>
 const stage=document.getElementById('stage'), out=document.getElementById('out'), productList=document.getElementById('productList'), multiUpload=document.getElementById('multiUpload');
 let active=null, drag=null, idSeq=0, selectedScene=0, selectedPurpose=0;
+// AI mode (default): SLAB edits the layout picture, background and products together — most natural light and
+// shadows; the prompt keeps products fixed, but the result still needs checking.
 // Strict mode: AI draws only the background; products are composited by this page, pixel for pixel.
-// AI mode: the AI redraws the whole scene including products (needs manual checking).
 // Phones (mobile wizard) have no composite step, so they always use AI mode.
-const PROMPT_MODE_KEY='freelyPromptMode_v1';
+const PROMPT_MODE_KEY='freelyPromptMode_v2'; // v2: default switched to AI mode, so earlier saved choices start over
 const IS_MOBILE_WIZARD=window.matchMedia('(max-width:480px)').matches;
 let promptMode=(()=>{
   if(IS_MOBILE_WIZARD)return 'ai';
   try{const v=localStorage.getItem(PROMPT_MODE_KEY);if(v==='ai'||v==='strict')return v;}catch(e){}
-  return 'strict';
+  return 'ai';
 })();
 const productOriginalFiles=new Map(); // productId -> original uploaded File (for 構圖素材 ZIP + originals download)
 let styleRefFile=null; // the uploaded reference-style image File (for 構圖素材 ZIP batch download), cleared alongside styleRefClearBtn
@@ -1506,8 +1513,9 @@ const scenes=[
  ['custom','自訂場景','custom','填寫背景顏色、材質、氛圍','商品排版優先']
 ];
 const purposes=[
- ['minimal','背景元素少量','Use zero or one small subdued background accent in existing free space. Plain background is acceptable.','少量點綴，不移動商品'],
+ // 「背景元素豐富」排第一，也是預設（selectedPurpose 初始為 0）。
  ['rich','背景元素豐富','Use layered background texture and several small accents only where existing empty space permits. No minimum prop count. If crowded, reduce or omit accents; never enlarge the scene or shrink products.','空間足夠才增加裝飾'],
+ ['minimal','背景元素少量','Use zero or one small subdued background accent in existing free space. Plain background is acceptable.','少量點綴，不移動商品'],
  ['random','背景元素隨機','Choose restrained background decoration density to fit existing empty space. Omit props if space is insufficient.','只隨機背景元素'],
  ['custom','自訂背景元素','custom','填寫裝飾、紋理與氛圍']
 ];
@@ -2663,63 +2671,50 @@ function getLayoutSpec(snapshot){
     layerOrder:'back to front; draw smaller layer index first',
     products:snapshot.products.map(({src,...p})=>p)};
 }
-function lightPrompt(backgroundOnly=false){
-  const enabled=lights.filter(l=>l[3]&&(!backgroundOnly||!['shadow','reflect','rim'].includes(l[0]))).map(l=>'- '+l[2]);
-  const excluded=lights.filter(l=>!l[3]||(backgroundOnly&&['shadow','reflect','rim'].includes(l[0]))).map(l=>l[0]);
-  return (enabled.join('\n')||'No optional lighting effects requested.')+
-    (excluded.length?'\nDisabled optional effects (do not reintroduce via scene/style): '+excluded.join(', ')+'.':'');
-}
 const KEY_LIGHT_TEXT={top:'from above and slightly in front',left:'from the upper left',right:'from the upper right'};
 function keyLightValue(){const v=document.getElementById('keyLight')?.value;return KEY_LIGHT_TEXT[v]?v:'top';}
-function keyLightPrompt(){
-  return 'Key light direction: '+KEY_LIGHT_TEXT[keyLightValue()]+'. Keep background highlights, light falloff and any background shadows consistent with this direction, matching the lighting already visible in the product photos. Do not relight product pixels.';
+// Products in reading order (left → right). Position words are relative to the product group (products all sit
+// inside the central safe zone, so canvas-relative words would call everything "centre").
+function aiProductList(snapshot){
+  const els=new Map(getProductElements().map(p=>[p.dataset.ref,p])),w=snapshot.canvas.width;
+  const ps=[...snapshot.products].sort((a,b)=>a.center.x-b.center.x);
+  const x0=ps[0].center.x, span=ps[ps.length-1].center.x-x0;
+  return ps.map((p,i)=>{
+    const t=span>w*0.03?(p.center.x-x0)/span:0.5, side=t<0.34?'left':t>0.66?'right':'middle';
+    const depth=ps.length<2?'':p.role==='front'?', in front':p.role==='back'?', behind':'';
+    const cat=els.get(p.ref)?.dataset.category||'', e=cat&&!cat.startsWith('tier_')?PRODUCT_SIZE_INDEX.get(cat):null;
+    return (i+1)+') '+(e?e[2]:'product')+' — '+side+depth;
+  }).join(', ');
 }
-function backgroundStyleBlock(backgroundOnly=false){
-  const view={
-    'front-facing eye-level composition':'eye-level background surfaces',
-    'slightly low angle hero composition':'subtly low-angle background surfaces only',
-    'slightly top-down product composition':'subtly top-down background surfaces only'
-  }[angle.value]||'background perspective compatible with the locked product photographs';
-  return [
-    'BACKGROUND STYLE — SUBORDINATE TO PRODUCT APPEARANCE AND GEOMETRY',
-    'Palette / material: '+getSceneText(),
-    'Decoration density: '+getPurposeText(),
-    'Background photographic character: '+lens.value+'; '+view+'. This is not a new camera instruction for products. Omit incompatible perspective cues.',
-    lightPrompt(backgroundOnly),
-    keyLightPrompt(),
-    'All decoration must fit existing empty space without covering product footprints. Never invent supports to lift products or align their bottom edges. A simple continuous background surface is optional, not a placement constraint. If contact is implausible, use an abstract seamless backdrop and omit contact shadows.',
-    'No steps, individual pedestals, generated text or extra products. Product shadows/halos belong to separate background pixels, never to the product texture.',
-    getStyleRefText(),
-    'The layout takes precedence over EVERY background instruction, including custom notes and style references.'
-  ].filter(Boolean).join('\n');
-}
-function productContract(snapshot){
-  return [
-    'SOURCE OF TRUTH — 2D EDITOR LAYOUT',
-    'Layout ID: '+snapshot.layoutId,
-    'Canvas: '+snapshot.canvas.width+' x '+snapshot.canvas.height+' px; aspect ratio '+snapshot.canvas.aspectRatio+'. Use the full canvas; do not crop or auto-fill the product group.',
-    'Geometry: '+snapshot.cleanFile+' and layout-spec.json. '+snapshot.referenceFile+' is an annotated guide only; remove guides and labels in the result.',
-    'Appearance: REF-xx-product.png assets. Each is the SAME cropped image used in the editor. Its whole PNG rectangle, including any remaining transparent margin, is the size unit. Do not auto-trim again. Original photos are archival only, not alternate size references.',
-    'Preserve all depicted items INSIDE each reference image as one rigid group. Do not split, merge, rearrange, duplicate or remove watches/accessories within an image.',
-    'Keep original photographic viewpoint, visible faces, proportions, text, logos, colors and texture. Do not infer 3D shape or regenerate product details.',
-    'Apply only the documented uniform fit, translation and clockwise image-plane rotation about the center, once. A 0 degree rotation is also binding; it does NOT mean straightening an angled object photographed in the source. Never add rotation, mirror, tilt, perspective warp or new camera viewpoint.',
-    'The rectangles below are BEFORE rotation. Rotated corner coordinates are for verification, not a second resizing box. Layer index is 2D occlusion only; it does not imply perspective scaling, lighting changes or bottom alignment.',
-    'PROTECTED PLACEMENT TABLE (back to front)',
-    ...snapshot.products.map(p=>JSON.stringify({ref:p.ref,asset:p.asset,layer:p.layer,rectPx:p.pixels,rectPercent:p.percent,centerPx:p.center,rotationClockwiseDegrees:p.rotationCW,cornersPx:p.corners})),
-    'Keep empty space, spacing, overlap and each independent bottom edge exactly as defined. Do not make the front product dominant by enlarging it.',
-    'If output resolution differs, scale the entire canvas and all coordinates by ONE common factor while keeping the same aspect ratio; never scale individual products independently.'
-  ].join('\n');
-}
+// AI 融合模式: SLAB / Gemini EDITS the attached layout picture. Editing one base image keeps the products far
+// more stable than rebuilding the scene from separate product photos and a coordinate table (which made the
+// model redraw, move and resize them), so the layout picture is "the photo" and only its white background may change.
 function buildCompositePrompt(snapshot=getLayoutSnapshot()){
   if(!snapshot.products.length)return '請先上傳商品並在中間編輯器完成排版，再複製 Prompt 或下載素材。';
+  const n=snapshot.products.length, ratio=snapshot.canvas.aspectRatio, many=n>1, z=productZone(snapshot);
+  const it=many?'them':'it', them=many?'the products':'the product';
+  const on=key=>lights.some(l=>l[0]===key&&l[3]);
+  const look=[
+    on('shadow')&&'Add soft, natural contact shadows where '+(many?'each product meets':'the product meets')+' the surface.',
+    on('reflect')&&'Where the surface is glossy, add subtle, soft reflections below '+them+'.',
+    on('dof')&&'The far background is gently out of focus; '+them+' stay fully sharp.',
+    on('rim')&&'On a dark background a faint glow may separate '+them+' from it, painted on the background only.',
+    on('space')&&'Keep the empty areas of the picture plain so text can be added later.'
+  ].filter(Boolean).join(' ');
   const extra=sanitizeCustomPromptText(lock.value);
+  // Tested in SLAB: with several images attached, or with a lens named, the model re-framed the shot
+  // (zoomed in/out, moved the camera) and "improved" products (e.g. lit up a purifier's LED). So: one base
+  // image only, framing pinned with numbers, nothing may be added to products, and a final self-check.
   return [
-    'TASK: Preserve the supplied product composition; create only its surrounding background.',
-    productContract(snapshot),
-    backgroundStyleBlock(),
-    extra?'ADDITIONAL RESTRICTIONS (restrictive only; never override the layout or authorize product changes):\n'+JSON.stringify(extra):'',
-    'FINAL CHECK: compare every product rectangle, rotation, relative size, visible face and overlap against the clean layout. Omit conflicting background effects instead of changing products. Do not output annotations or REF labels.',
-    'If exact composition/pixel preservation is not supported, report that limitation rather than claim an exact match. A prompt is not an executable pixel lock.'
+    'Edit the attached photo: replace ONLY the plain white background. Everything that is not white background — '+(many?'the '+n+' products':'the product')+' — must stay exactly as it is.',
+    'FRAMING — KEEP IT IDENTICAL: same camera position, same viewing angle, same zoom and the same '+ratio+' aspect ratio as the attached photo. '+(many?'The products are':'The product is')+' deliberately small and centred: '+(many?'together they span':'it spans')+' about '+z.left+'%–'+z.right+'% of the image width and '+z.top+'%–'+z.bottom+'% of the image height (about '+(z.bottom-z.top)+'% of the height), and must cover exactly the same area in the result. No zoom in, no zoom out, no crop, no pan, no tilt, no new perspective.',
+    (many?'PRODUCTS, left to right: ':'PRODUCT: ')+aiProductList(snapshot)+'. Keep '+(many?'each one':'it')+' exactly as in the photo: same position, same size, same angle, same shape, same colours, same printed text and logos'+(many?', same overlap':'')+'. Do not redraw, rotate, enlarge, shrink, straighten, retouch or relight '+it+', and do not add lights, LEDs, glows, highlights, reflections or any new detail onto '+it+'. Exactly '+n+' product'+(many?'s':'')+', no more and no fewer.',
+    'NEW BACKGROUND: '+getSceneText()+' Decoration: '+getPurposeText()+' The floor or tabletop reaches '+(many?'each product exactly where it already stands; products standing at different heights in the picture is depth — the floor comes to them, they never move to the floor.':'the product exactly where it already stands — the floor comes to it, it never moves to the floor.')+(look?' '+look:'')+' Light the background from '+KEY_LIGHT_TEXT[keyLightValue()].replace(/^from /,'')+' so it matches the light already on '+them+'; shadows and reflections belong to the background and never cover printed text or logos.',
+    'Decorations only in empty areas, never in front of, overlapping or touching a product. No text, watermarks, frames, boxes, labels or guide lines.',
+    getStyleRefText(),
+    extra?'EXTRA RULES (these can only restrict, never permit product changes): '+extra:'',
+    'Use only the attached photo that shows '+(many?'all the products':'the product')+' on white; ignore any other attached image.',
+    'FINAL CHECK before you output: compare with the attached photo — same '+(many?'products':'product')+', same size, same place, same angle, nothing added to '+it+', same framing. If anything differs, correct it.'
   ].filter(Boolean).join('\n\n');
 }
 // Union of all rotated product bounds, as whole percentages of the canvas (top-left origin).
@@ -2730,17 +2725,30 @@ function productZone(snapshot){
   return {left:px(Math.min(...b.map(q=>q.left))),right:px(Math.max(...b.map(q=>q.right))),
     top:py(Math.min(...b.map(q=>q.top))),bottom:py(Math.max(...b.map(q=>q.bottom)))};
 }
+// Background-only prompt for strict mode. Written as "the finished ad photo with the products lifted out":
+// describing the product area as a rectangular "zone"/"surface"/"backdrop", or talking about products,
+// made image models draw a blank board, panel or paper sweep to mark the spot. So this prompt describes
+// an ordinary scene whose middle is simply open, and explicitly forbids anything that marks that area.
 function genBackgroundPrompt(snapshot=getLayoutSnapshot()){
   if(!snapshot.products.length)return '請先上傳商品並在中間編輯器完成排版，再複製背景咒語。';
-  const z=productZone(snapshot),edgeLow=Math.max(z.top,z.bottom-8);
+  const z=productZone(snapshot),wallLine=Math.max(z.top,z.bottom-8);
+  const view={
+    'front-facing eye-level composition':'eye level, looking straight ahead',
+    'slightly low angle hero composition':'slightly below eye level',
+    'slightly top-down product composition':'slightly above, looking a little down'
+  }[angle.value]||'eye level';
+  const on=key=>lights.some(l=>l[0]===key&&l[3]);
   return [
-    'TASK: Generate an EMPTY BACKGROUND PLATE only. Real product photos will be composited on top later by software, pixel for pixel. Do NOT draw any product, package, bottle, box, device, logo, text, label, placeholder shape or silhouette.',
-    'Canvas: '+snapshot.canvas.width+' x '+snapshot.canvas.height+' px; aspect ratio '+snapshot.canvas.aspectRatio+'. Fill the whole frame at exactly this aspect ratio; no borders, letterboxing or frames. Layout ID: '+snapshot.layoutId+'.',
-    'PRODUCT ZONE (will be covered by the real products): '+z.left+'%–'+z.right+'% of the image width and '+z.top+'%–'+z.bottom+'% of the image height, measured from the top-left corner. Keep this zone a simple, continuous, evenly lit surface and backdrop: no props, objects, strong patterns, hard shadows or bright hotspots inside it. Place decorations only outside the zone, never overlapping its edges.',
-    'FLOOR LINE: the products stand with their lowest edges at about '+z.bottom+'% of the image height. If the style shows a floor or tabletop, it must continue under and in front of that line. Any visible floor–backdrop edge must sit behind the zone, between '+z.top+'% and '+edgeLow+'% of the image height, never below the floor line. A seamless sweep with no visible edge is preferred.',
-    'No reference image is required. If one is attached, use it only to locate the zone; reproduce nothing from it.',
-    backgroundStyleBlock(true),
-    'No product-shaped shadows, reflections or halos: product shadows are added later by software. No text, frames, guides or watermarks.'
+    'TASK: A photographic BACKGROUND for a product advertisement, with nothing standing in the middle. Picture the finished ad photo with the products lifted out: what remains is the set itself — its floor, its back wall and its light. The products are added afterwards by software, so draw none of them and nothing that stands in for them.',
+    'FORMAT: '+snapshot.canvas.width+' x '+snapshot.canvas.height+' px, aspect ratio '+snapshot.canvas.aspectRatio+'. The scene fills the whole frame edge to edge — no borders, frames or letterboxing.',
+    ['SCENE: '+getSceneText(),
+     'Decoration: '+getPurposeText(),
+     'Camera: '+lens.value+', '+view+'.',
+     'Lighting: soft key light '+KEY_LIGHT_TEXT[keyLightValue()]+', with smooth, natural falloff across the whole scene.'+(on('dof')?' The far background is gently out of focus.':''),
+     getStyleRefText()].filter(Boolean).join('\n'),
+    'KEEP THE MIDDLE OPEN: the products will later stand in the area from '+z.left+'% to '+z.right+'% of the width and '+z.top+'% to '+z.bottom+'% of the height (measured from the top-left), resting on the floor at about '+z.bottom+'% of the height. In that area show only the same floor and back wall that surround it — same colour, texture and light, nothing added. Place any decorations near the edges and corners of the frame, outside that area.',
+    'FLOOR: the floor or tabletop runs from the bottom edge of the picture back past the '+z.bottom+'% line. If the back wall meets the floor in a visible line, that line sits higher than '+wallLine+'% of the height, behind where the products will stand; a soft gradual transition is also fine.',
+    'DO NOT DRAW: any product, bottle, jar, box, device or package; people or hands; text, logos, labels or watermarks. Nothing that marks the empty area: no blank board, panel, card, poster, sign, screen, picture frame, canvas, backdrop stand, paper roll with visible edges, plinth, pedestal, podium, platform, step, outline or rectangle. No shadows shaped like products.'
   ].join('\n\n');
 }
 function genCompositePrompt(){return buildCompositePrompt();}
@@ -2789,7 +2797,7 @@ function updateLayoutStatus(){
   const flagNote=flagged?' 已忽略背景描述中疑似改動商品的句子；請檢查其餘描述。':'';
   el.textContent=!snapshot.products.length ? '請先上傳商品。'
     : promptMode==='strict' ? head+'嚴格模式：AI 只畫背景，商品由本工具貼回，像素零改動。'+flagNote
-    : head+(flagNote||'風格不改寫排版。')+' AI 會重畫商品，生成後請核對；包裝、文字不能變時請改用嚴格模式。';
+    : head+'AI 融合模式：在 SLAB 附加「排版底圖」，AI 只改它的白色背景；生成後請核對商品位置、大小與文字。'+flagNote;
 }
 multiUpload.addEventListener('change',async e=>{const files=[...e.target.files];multiUpload.value='';for(const file of files)await addProductFromFile(file);refreshList();genAll();markUpdated();});
 
@@ -3133,7 +3141,30 @@ async function performCopyPrompt(){
   catch(err){alert(err.message);}
 }
 // The S.LAB guide image describes the AI-composite flow (upload products + layout), so strict mode skips it.
-document.getElementById('copy').onclick=()=>promptMode==='strict'?performCopyPrompt():openOperationGuide('copy');
+// The S.LAB guide image (程式檔案/S.LAB操作細節.jpg) still says to attach every product image and pick Gemini 3 Pro,
+// which is what made SLAB re-frame and redraw products. Until that image is redrawn, copy directly.
+// To bring the guide back: ()=>promptMode==='strict'?performCopyPrompt():openOperationGuide('copy')
+document.getElementById('copy').onclick=()=>performCopyPrompt();
+// AI mode: the clean layout picture (products on white, exactly as placed) is the photo SLAB edits.
+async function layoutBaseBlob(){
+  const snap=await readyLayout();
+  return {snap,blob:new Blob([dataURLBytes(await renderLayout(snap))],{type:'image/png'})};
+}
+document.getElementById('downloadLayoutBase')?.addEventListener('click',async()=>{
+  try{const {snap,blob}=await layoutBaseBlob();downloadBlob(blob,snap.cleanFile);}catch(err){alert(err.message);}
+});
+document.getElementById('copyLayoutBase')?.addEventListener('click',async e=>{
+  const btn=e.currentTarget;
+  try{
+    if(!navigator.clipboard?.write||typeof ClipboardItem==='undefined')throw new Error('unsupported');
+    // Pass a promise so the clipboard write starts inside the click (Safari requires that).
+    await navigator.clipboard.write([new ClipboardItem({'image/png':layoutBaseBlob().then(r=>r.blob)})]);
+    btn.textContent='✓ 已複製，到 SLAB 按 Ctrl+V';setTimeout(()=>btn.textContent='📋 複製排版底圖',1800);
+  }catch(err){
+    if(!getProductElements().length){alert('請先上傳商品並完成排版。');return;}
+    alert('這個瀏覽器無法直接複製圖片，請改用「下載排版底圖」，再拖到 SLAB。');
+  }
+});
 document.getElementById('clearAll').onclick=()=>{getProductElements().forEach(p=>p.remove());productOriginalFiles.clear();clearUserPositions();active=null;refreshList();leftChanged()}
 document.getElementById('toggleGrid').onclick=()=>stage.classList.toggle('showGrid');
 document.getElementById('toggleZoom').onclick=()=>{
@@ -3351,7 +3382,7 @@ async function createExportBundle(){
     try{files.push({name:styleRefDownloadName(),data:dataURLBytes(imagePNG(await decodeAsset(url)))});}
     finally{URL.revokeObjectURL(url);}
   }
-  files.push({name:'使用說明.txt',data:'嚴格模式（商品零改動，建議）：把 background-only-prompt.txt 貼到 SLAB／Gemini，選和畫布相同的比例（'+snapshot.canvas.aspectRatio+'），不需要上傳任何商品圖。把生成的背景貼回本工具（Ctrl+V、拖曳或選檔），由程式合成商品與陰影。請使用透明背景商品 PNG；自動裁邊不等於去背。\nAI 融合模式：上傳 layout-clean 圖、layout-reference 圖、所有 REF-xx-product.png，貼上 prompt.txt。AI 會重畫商品，生成後請核對包裝、文字與 Logo；咒語不能保證生成端逐像素遵守。layout-spec.json 是精確座標備查；originals 僅供留存，不必重複上傳。REF-STYLE 僅供背景參考。\n不要混用不同次下載的素材與咒語；用 LAYOUT 編號核對。\n編輯原始檔.json 僅供本工具還原，不必上傳給 AI。'});
+  files.push({name:'使用說明.txt',data:'嚴格模式（商品零改動，建議）：把 background-only-prompt.txt 貼到 SLAB／Gemini，選和畫布相同的比例（'+snapshot.canvas.aspectRatio+'），不要附加任何圖片（商品圖、構圖圖都不用）。把生成的背景貼回本工具（Ctrl+V、拖曳或選檔），由程式合成商品與陰影。請使用透明背景商品 PNG；自動裁邊不等於去背。\nAI 融合模式：在 SLAB 只附加 '+snapshot.cleanFile+' 這一張（AI 只改它的白色背景）。不要再附加 REF-xx-product.png 或 '+snapshot.referenceFile+'（標註圖），多附圖片 AI 會重組畫面，商品容易被縮放、轉向或重畫。比例選 '+snapshot.canvas.aspectRatio+'，貼上 prompt.txt；模型建議先試 Gemini 2.5 Flash，再和 3 Pro 比較。生成後請核對商品位置、大小、角度、包裝文字與 Logo；咒語能降低變動但不能保證。layout-spec.json 是精確座標備查；originals 僅供留存。REF-STYLE 僅供背景參考。\n不要混用不同次下載的素材與咒語；用 LAYOUT 編號核對。\n編輯原始檔.json 僅供本工具還原，不必上傳給 AI。'});
   return {blob:zipFiles(files),snapshot,files};
 }
 async function exportLayoutPNG(){
@@ -3430,7 +3461,7 @@ document.getElementById('downloadComposite')?.addEventListener('click',async()=>
   }catch(err){alert(err.message);}
 });
 
-document.getElementById('exportLayout').onclick=()=>openOperationGuide('export');
+document.getElementById('exportLayout').onclick=()=>exportLayoutPNG();   // guide image outdated, see the 'copy' handler
 const SLAB_GENERATOR_URL='https://design.shopee.io/creator/creative-generator';
 document.getElementById('openSlabGenerator').onclick=()=>window.open(SLAB_GENERATOR_URL, '_blank', 'noopener');
 document.getElementById('openSlabStrict')?.addEventListener('click',()=>window.open(SLAB_GENERATOR_URL,'_blank','noopener'));
@@ -3589,6 +3620,7 @@ function getLayoutState(){
   const styleImg=document.getElementById('styleRefPreviewImg');
   const styleRefData=location.hash==='#2'&&styleRefFile&&styleImg?.complete&&styleImg.naturalWidth?imagePNG(styleImg):'';
   return {version:'2.0',savedAt:new Date().toISOString(),selectedCanvasRatio,selectedScene,selectedPurpose,
+    purposeKey:(purposes[selectedPurpose]||purposes[0])[0],
     customScene:customScene.value,customPurpose:customPurpose.value,lens:lens.value,angle:angle.value,lock:lock.value,
     lights:lights.map(l=>l[3]),keyLight:keyLightValue(),
     shadow:Object.fromEntries(SHADOW_SLIDERS.map(([k,id])=>[k,Number(document.getElementById(id)?.value)||0])),
@@ -3620,7 +3652,11 @@ async function restoreLayoutState(data){
   getProductElements().forEach(p=>p.remove());productOriginalFiles.clear();canvasPositions.clear();active=null;
   selectedCanvasRatio=data.selectedCanvasRatio||'1/1';
   selectedScene=Number.isInteger(data.selectedScene)&&scenes[data.selectedScene]?data.selectedScene:0;
-  selectedPurpose=Number.isInteger(data.selectedPurpose)&&purposes[data.selectedPurpose]?data.selectedPurpose:0;
+  // Restore by key: the option order changed (豐富 now first). Older files only have the index in the old order.
+  const OLD_PURPOSE_ORDER=['minimal','rich','random','custom'];
+  const purposeKey=typeof data.purposeKey==='string'?data.purposeKey:Number.isInteger(data.selectedPurpose)?OLD_PURPOSE_ORDER[data.selectedPurpose]:'';
+  const purposeIdx=purposes.findIndex(p=>p[0]===purposeKey);
+  selectedPurpose=purposeIdx>=0?purposeIdx:0;
   customScene.value=data.customScene||'';customPurpose.value=data.customPurpose||'';
   if([...lens.options].some(o=>o.value===data.lens))lens.value=data.lens;
   if([...angle.options].some(o=>o.value===data.angle))angle.value=data.angle;
