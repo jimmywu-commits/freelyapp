@@ -557,6 +557,27 @@ button:disabled{cursor:not-allowed;background:#2a2f3d!important;color:#6b7383!im
 .optionCard.active .thumb{
   box-shadow:0 0 0 2px rgba(141,211,255,.25);
 }
+/* 背景風格 category filter */
+.sceneFilter{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.sceneFilterBtn{width:auto;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:800;background:#1a1f2b;border:1px solid #333b4d;color:#c9d2e0}
+.sceneFilterBtn span{margin-left:5px;font-size:10px;color:#7f8aa0;font-weight:700}
+.sceneFilterBtn.on{background:#8dd3ff;border-color:#8dd3ff;color:#06101a}
+.sceneFilterBtn.on span{color:#06101a;opacity:.7}
+.scenePicked{font-size:11px;color:#9aa3b2;margin:-2px 0 8px}
+.scenePicked:empty{display:none}
+.scenePicked b{color:#8dd3ff}
+.thumb.sceneImg.drawn{background-size:cover}
+/* Illustrated thumbnails (背景元素選項) drawn as inline SVG */
+.thumb.illus:before,.thumb.illus:after{display:none}
+/* The drawing is fitted (not cropped); this backdrop + floor fills any extra width on wide cards. */
+.thumb.illus{background:linear-gradient(#efe3d4 0 64.5%,#e2d2bf 64.5% 67.8%,#f7efe6 67.8%)}
+.thumb.illus svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* 主光源方向 icon buttons */
+.keyLightGroup{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.keyLightBtn{display:grid;justify-items:center;gap:4px;padding:8px 4px 7px;background:#11141c;border:1px solid var(--line);border-radius:12px;color:#c9d2e0;font-size:12px;font-weight:700;transition:.15s}
+.keyLightBtn svg{width:58px;height:40px;display:block}
+.keyLightBtn:hover{border-color:#3b4458}
+.keyLightBtn.on{border-color:var(--green);background:rgba(124,240,189,.1);color:var(--green);box-shadow:0 0 0 2px rgba(124,240,189,.15)}
 
 .toggleRow{
   display:grid;
@@ -1363,6 +1384,8 @@ html,body{height:100%;overflow:hidden}
 </div>
 
 <h2>背景風格</h2><p style="font-size:12px;color:#9aa3b2">只改背景顏色、材質與氛圍。商品位置、大小、角度以中間編輯器為準。</p>
+<div class="sceneFilter" id="sceneFilter" role="tablist" aria-label="背景風格分類"></div>
+<p class="scenePicked" id="scenePicked" role="status"></p>
 <div class="optionGrid" id="sceneGrid"></div>
 <textarea id="customScene" class="hidden" placeholder="請輸入自訂場景，中文也可以。建議只寫顏色、材質、光影、氛圍，不要寫留白/遠景/重構圖。例如：夏日清爽藍白色棚拍，有水波光影"></textarea>
 
@@ -1378,8 +1401,14 @@ html,body{height:100%;overflow:hidden}
 
 <p style="font-size:11px;color:#9aa3b2">視角只描述背景表面，不重拍商品；若與商品原圖不相容，省略背景透視線索。</p><h2>背景光影</h2>
 <div class="lightGrid" id="lightGrid"></div>
-<label for="keyLight">主光源方向</label>
-<select id="keyLight"><option value="top">正上方／正面（預設）</option><option value="left">左上方</option><option value="right">右上方</option></select>
+<label>主光源方向</label>
+<div class="keyLightGroup" id="keyLightGroup" role="radiogroup" aria-label="主光源方向">
+  <button type="button" class="keyLightBtn" data-light="left" role="radio"><span>左上方</span></button>
+  <button type="button" class="keyLightBtn" data-light="top" role="radio"><span>正上方</span></button>
+  <button type="button" class="keyLightBtn" data-light="right" role="radio"><span>右上方</span></button>
+</div>
+<!-- The buttons write to this hidden select; prompts, shadows and saved layouts read it. -->
+<select id="keyLight" hidden><option value="top">正上方／正面（預設）</option><option value="left">左上方</option><option value="right">右上方</option></select>
 <p style="font-size:11px;color:#9aa3b2;margin:4px 0 0">請選和商品原圖光線一致的方向。會同時控制背景光線，以及嚴格模式的陰影方向。</p>
 
 <label>補充保護限制（選填）</label>
@@ -1500,18 +1529,66 @@ window.addEventListener('hashchange', () => {
 });
 
 // Scene, density and lights describe background only; the layout always has priority.
+// [key, 名稱, background prompt, 短說明, badge]. Saved layouts and the phone wizard refer to scenes by key,
+// so the order can change freely; 試試手氣 and 自訂 stay last.
 const scenes=[
+ // 棚拍質感
  ['white','未來感白色棚','Pure white seamless backdrop; glossy white background surface; cool diffused ambient light.','冷白・光滑材質','僅控制背景'],
  ['beige','暖米色棚拍','Beige and cream backdrop; fine linen or stone background texture; soft warm ambient light.','暖米・自然質感','僅控制背景'],
  ['clean','電商乾淨白棚','Neutral white seamless backdrop; matte background surface; even neutral illumination.','中性白・霧面質感','僅控制背景'],
  ['window','精品展示棚','Charcoal backdrop; dark polished stone background texture; restrained amber background light.','炭灰・暖色精品感','僅控制背景'],
  ['gradient','漸層色棚','Smooth pastel gradient backdrop; matte background surface; soft diffused illumination.','柔和漸層・霧面','僅控制背景'],
- ['season','節慶氛圍棚','Burgundy, champagne and cream background palette; subtle festive textures. Decoration quantity is controlled separately.','節慶色調・裝飾量另選','僅控制背景'],
  ['tech','科技生活棚','Slate grey and muted blue backdrop; brushed metal or matte desktop background texture; diffused cool background light.','冷灰藍・科技材質','僅控制背景'],
  ['dark','黑色精品棚','Deep black backdrop; dark marble background texture; restrained pools of warm background light.','深黑・低調光影','僅控制背景'],
+ ['silk','奢華絲綢舞台','Luxurious stage of flowing satin drapery in royal blue (or deep red), a soft top spotlight pooling on the floor, fine sparkles and one gold ribbon accent. Premium, elegant mood.','寶藍絲綢・頂光金帶','僅控制背景'],
+ ['sunlight','窗光葉影','Warm beige plaster wall and a low ledge bathed in diagonal window sunlight, with soft leaf shadows on the wall and a few green leaves at one edge. Natural, calm lifestyle mood.','米色牆面・斜光葉影','僅控制背景'],
+ // 節慶大促
+ ['season','節慶氛圍棚','Burgundy, champagne and cream background palette; subtle festive textures. Decoration quantity is controlled separately.','節慶色調・裝飾量另選','僅控制背景'],
+ ['party','大促派對舞台','Festive sale-event stage in vivid orange-gold or hot pink: a warm spotlight glow on a soft floor, floating gold confetti ribbons and sparkles, with a folded paper fan or a wrapped gift box as accents at the sides.','亮橘桃紅・彩帶聚光','僅控制背景'],
+ ['redgold','紅金喜慶','Rich festive red background with a flowing wave of gold glitter, soft red satin drapes, a folded paper fan and a few gold coins as accents, warm glow and sparkles. Lucky, celebratory New Year and big-sale mood.','正紅金粉・摺扇金幣','僅控制背景'],
+ ['oriental','東方國風','Elegant oriental setting in deep teal, indigo or warm gold: subtle traditional patterns (seigaiha waves or interlocking coin circles), a round moon-gate arch behind, a smooth wooden floor, auspicious clouds and gold-leaf plum blossoms as accents.','青海波紋・圓拱金箔','僅控制背景'],
+ ['moon','中秋月夜','Mid-Autumn night in warm golden tones: a large glowing full moon in the background, sprigs of yellow osmanthus blossoms at the edges and a pale marble tabletop.','金黃滿月・石材桌面','僅控制背景'],
+ // 季節場景
+ ['beach','夏日海灘','Bright summer beach: clear blue sky with light clouds, turquoise sea and gentle waves, a smooth white-sand floor, a frangipani flower and a blurred monstera leaf at the edges, soft sun flare.','藍天白沙・熱帶植物','僅控制背景'],
+ ['underwater','海底世界','Playful underwater scene: bright blue water with rippling light caustics, a pale sandy seabed floor, seaweed, small pebbles and rising bubbles at the sides.','水光波紋・白沙海草','僅控制背景'],
+ ['autumn','秋日野餐','Autumn picnic: a checked picnic blanket on golden grass in warm late-afternoon sunlight, scattered maple leaves and a string of softly glowing fairy lights, maple branches along the top edge.','格紋野餐墊・楓葉串燈','僅控制背景'],
+ ['winter','冬日雪景','Winter night in deep blue: a soft spotlight beam, gently falling snowflakes and bokeh, a smooth snowy floor. Calm, magical holiday mood.','深藍夜空・雪花聚光','僅控制背景'],
+ // 插畫拼貼
+ ['doodle','手繪塗鴉','Hand-drawn illustration style on textured paper: a flat bright colour with crayon texture, playful doodled stars, organic cut-out colour shapes and squiggly lines near the edges. Fun, youthful mood.','紙紋蠟筆・有機色塊','僅控制背景'],
+ ['collage','拼貼手帳','Trendy paper-collage style: torn paper pieces, grid paper, halftone dots and thin line graphics with pressed botanical sketches, in muted olive, grey or lime. Editorial, creative mood.','撕紙方格・壓花線條','僅控制背景'],
  ['lucky','試試手氣','LUCKY_RANDOM_STYLE','隨機背景；再點一次換風格','商品排版不變'],
  ['custom','自訂場景','custom','填寫背景顏色、材質、氛圍','商品排版優先']
 ];
+// Category filter above the style cards. 試試手氣 and 自訂 show in every category.
+const SCENE_GROUPS=[
+  {key:'all',label:'全部'},
+  {key:'studio',label:'棚拍質感',scenes:['white','beige','clean','window','gradient','tech','dark','silk','sunlight']},
+  {key:'festive',label:'節慶大促',scenes:['season','party','redgold','oriental','moon']},
+  {key:'seasonal',label:'季節場景',scenes:['beach','underwater','autumn','winter']},
+  {key:'illus',label:'插畫拼貼',scenes:['doodle','collage']}
+];
+let sceneFilter='all';
+// Photo thumbnails in 場景縮圖/<名稱>.<ext>. The newer styles use small JPG crops (480×240) of the reference
+// banners. A style without a photo shows its drawn colour preview below, which also sits behind every photo
+// as a fallback in case the file is missing.
+const SCENE_THUMB_PHOTOS=new Map([
+  ...['white','beige','clean','window','gradient','season','tech','dark','lucky'].map(k=>[k,'png']),
+  ...['silk','sunlight','party','redgold','oriental','moon','beach','underwater','autumn','winter','doodle','collage'].map(k=>[k,'jpg'])
+]);
+const SCENE_THUMB_DRAWN={
+  silk:'radial-gradient(ellipse at 62% 22%,rgba(190,215,255,.95),transparent 42%),repeating-linear-gradient(100deg,rgba(255,255,255,.10) 0 7px,transparent 7px 18px),linear-gradient(160deg,#0a1a63,#1d4ed8 70%,#0b1f6e)',
+  sunlight:'repeating-linear-gradient(118deg,rgba(255,255,255,.42) 0 7px,transparent 7px 22px),radial-gradient(ellipse at 88% 30%,rgba(90,120,70,.35),transparent 22%),linear-gradient(#efe2c8 0 66%,#f6ecd8 66% 70%,#e6d4b4 70%)',
+  party:'radial-gradient(circle at 68% 62%,#fff1b8 0 9%,transparent 34%),radial-gradient(circle at 30% 25%,#ffe08a 0 2px,transparent 3px),radial-gradient(circle at 82% 20%,#ffe08a 0 2px,transparent 3px),linear-gradient(135deg,#f59e0b,#ec4899)',
+  redgold:'radial-gradient(ellipse at 70% 60%,rgba(255,220,140,.9) 0 6%,transparent 30%),radial-gradient(ellipse at 45% 75%,rgba(255,210,120,.5),transparent 25%),linear-gradient(135deg,#9b0016,#e11d2e 60%,#b00018)',
+  oriental:'radial-gradient(circle at 66% 50%,transparent 0 34%,#d8b56a 34.5% 36%,transparent 36.5%),radial-gradient(circle at 66% 50%,#2f8f83 0 34%,transparent 34.5%),linear-gradient(#174b43 0 70%,#c9a86a 70% 74%,#1e5b52 74%)',
+  moon:'radial-gradient(circle at 70% 38%,#fff8df 0 18%,#f7d88a 19% 22%,transparent 23%),linear-gradient(#e7b04a 0 64%,#efe6d6 64%)',
+  beach:'radial-gradient(ellipse at 70% 18%,#fff 0 6%,transparent 20%),linear-gradient(#7cc8f0 0 38%,#22b1d4 38% 56%,#f3e9d6 56%)',
+  underwater:'radial-gradient(ellipse at 60% 15%,#7ef0ff,transparent 45%),radial-gradient(circle at 25% 70%,#2f9b4d 0 4%,transparent 5%),linear-gradient(#1677e6 0 64%,#dfe8d8 64%)',
+  autumn:'radial-gradient(circle at 85% 12%,#e9731d 0 5%,transparent 6%),repeating-linear-gradient(90deg,rgba(80,80,80,.18) 0 5px,transparent 5px 11px),linear-gradient(#f6c453 0 38%,#c9b07a 38% 52%,#ece7de 52%)',
+  winter:'radial-gradient(circle at 78% 22%,#fff 0 3px,transparent 4px),radial-gradient(circle at 58% 40%,#fff 0 2px,transparent 3px),radial-gradient(ellipse at 66% 28%,#6fa8ff,transparent 48%),linear-gradient(#0b1b5e 0 70%,#7fc2f2 70%)',
+  doodle:'radial-gradient(circle at 76% 34%,#7fb6e8 0 10%,transparent 11%),radial-gradient(circle at 60% 72%,#ffd77a 0 11%,transparent 12%),radial-gradient(circle at 40% 30%,#ff8a5c 0 6%,transparent 7%),#ff5a26',
+  collage:'linear-gradient(90deg,transparent 52%,rgba(248,248,240,.92) 52% 84%,transparent 84%),repeating-linear-gradient(0deg,rgba(0,0,0,.10) 0 1px,transparent 1px 8px),repeating-linear-gradient(90deg,rgba(0,0,0,.10) 0 1px,transparent 1px 8px),#7a8450'
+};
 const purposes=[
  // 「背景元素豐富」排第一，也是預設（selectedPurpose 初始為 0）。
  ['rich','背景元素豐富','Use layered background texture and several small accents only where existing empty space permits. No minimum prop count. If crowded, reduce or omit accents; never enlarge the scene or shrink products.','空間足夠才增加裝飾'],
@@ -1519,6 +1596,41 @@ const purposes=[
  ['random','背景元素隨機','Choose restrained background decoration density to fit existing empty space. Omit props if space is insufficient.','只隨機背景元素'],
  ['custom','自訂背景元素','custom','填寫裝飾、紋理與氛圍']
 ];
+// Illustrations for 背景元素選項: the same three products always stay in the middle; only the decorations around
+// them change, which is what each option means (decorations only use empty space, products never move).
+const PURPOSE_ILLUS=(()=>{
+  const sparkle=(x,y,s,c)=>`<path d="M${x} ${y-s}L${x+s*.28} ${y-s*.28}L${x+s} ${y}L${x+s*.28} ${y+s*.28}L${x} ${y+s}L${x-s*.28} ${y+s*.28}L${x-s} ${y}L${x-s*.28} ${y-s*.28}Z" fill="${c}"/>`;
+  const leaf=(x,y,r,c)=>`<ellipse cx="${x}" cy="${y}" rx="5.5" ry="2.4" transform="rotate(${r} ${x} ${y})" fill="${c}"/>`;
+  const scene=decor=>`<svg viewBox="0 0 160 76" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <rect width="160" height="52" fill="#efe3d4"/><rect y="50" width="160" height="26" fill="#f7efe6"/>
+    <rect y="49" width="160" height="2.5" fill="#e2d2bf" opacity=".7"/>
+    ${decor}
+    <ellipse cx="68" cy="62.5" rx="11" ry="2.3" fill="#3b2a1a" opacity=".16"/>
+    <ellipse cx="84.5" cy="62.8" rx="8" ry="2" fill="#3b2a1a" opacity=".18"/>
+    <ellipse cx="100" cy="62.8" rx="9.5" ry="2" fill="#3b2a1a" opacity=".16"/>
+    <rect x="60" y="20" width="16" height="42" rx="4" fill="#a9b1bd"/><rect x="60" y="20" width="16" height="6" rx="3" fill="#c3cad3"/>
+    <rect x="79" y="34" width="11" height="28" rx="3" fill="#2f343d"/><rect x="82" y="28" width="5" height="7" rx="1.2" fill="#cfd4db"/>
+    <rect x="93" y="44" width="14" height="18" rx="2" fill="#d6c2a4"/>
+  </svg>`;
+  const rich=
+    // soft bokeh on the backdrop
+    `<circle cx="22" cy="13" r="6" fill="#fff" opacity=".55"/><circle cx="138" cy="12" r="7" fill="#fff" opacity=".5"/><circle cx="120" cy="7" r="3" fill="#fff" opacity=".6"/>`
+    // branch with leaves on the left
+    +`<path d="M10 66 C14 50 20 36 32 20" stroke="#6b8c5e" stroke-width="1.4" fill="none"/>`
+    +[[14,54,-60,'#7ea67f'],[19,46,-30,'#93bb8e'],[16,40,-75,'#7ea67f'],[25,34,-35,'#93bb8e'],[23,28,-80,'#7ea67f'],[31,22,-40,'#93bb8e']].map(a=>leaf(...a)).join('')
+    // ornaments, ribbon and berries on the floor at both sides
+    +`<circle cx="38" cy="63" r="5" fill="#c9a25b"/><circle cx="36.5" cy="61.5" r="1.4" fill="#fff" opacity=".7"/><circle cx="47" cy="66.5" r="2.8" fill="#b4475a"/>`
+    +`<circle cx="128" cy="60" r="7" fill="#b4475a"/><circle cx="125.8" cy="57.8" r="1.8" fill="#fff" opacity=".6"/><circle cx="142" cy="65" r="4.5" fill="#e2c07c"/>`
+    +`<path d="M114 71 C124 64 134 72 152 58" stroke="#d07a8b" stroke-width="2" fill="none" stroke-linecap="round"/>`
+    +sparkle(112,22,3.5,'#e7c26a')+sparkle(150,30,2.6,'#e7c26a')+sparkle(44,10,2.8,'#e7c26a');
+  const minimal=`<circle cx="131" cy="64" r="4" fill="#c9a25b"/><circle cx="129.8" cy="62.8" r="1.1" fill="#fff" opacity=".7"/>`;
+  const dashed=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="#b49c80" stroke-width="1.3" stroke-dasharray="2.5 2"/><text x="${x}" y="${y+r*.42}" font-size="${r*1.2}" font-weight="700" text-anchor="middle" fill="#b49c80" font-family="sans-serif">?</text>`;
+  const random=dashed(30,58,7)+dashed(130,58,7)+dashed(24,22,5.5)+dashed(118,24,4.5)
+    // a die in the corner
+    +`<rect x="137" y="5" width="17" height="17" rx="4" fill="#fff" stroke="#cdb99f"/>`
+    +[[141.5,9.5],[149.5,9.5],[145.5,13.5],[141.5,17.5],[149.5,17.5]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.4" fill="#8a7560"/>`).join('');
+  return {rich:scene(rich),minimal:scene(minimal),random:scene(random)};
+})();
 const lights=[
  ['shadow','背景接觸陰影','Add subtle shadows on background pixels only, at plausible existing contact points. If contact is ambiguous, omit the shadow; do not move, flatten or rotate a product to make contact.',true],
  ['reflect','背景柔和反光','Allow subtle light reflections on background surfaces only. Do not mirror, duplicate or repaint products.',true],
@@ -1529,27 +1641,46 @@ const lights=[
 ];
 let luckyStyleCache='';
 
+function sceneInFilter(key){
+  if(sceneFilter==='all'||key==='lucky'||key==='custom')return true;
+  return (SCENE_GROUPS.find(g=>g.key===sceneFilter)?.scenes||[]).includes(key);
+}
+// Used by the style cards and by the phone wizard (which has its own, shorter list).
+function selectSceneByKey(key){
+  const i=scenes.findIndex(s=>s[0]===key);if(i<0)return;
+  selectedScene=i;if(key==='lucky')luckyStyleCache='';
+  renderCards();updateCustomVisibility();leftChanged();
+}
 function renderCards(){
-  sceneGrid.innerHTML=scenes.map((s,i)=>{
-    const isCustom = s[2] === 'custom';
+  const filterEl=document.getElementById('sceneFilter');
+  if(filterEl){
+    filterEl.innerHTML=SCENE_GROUPS.map(g=>{
+      const n=g.scenes?g.scenes.length:scenes.length-2;
+      return `<button type="button" class="sceneFilterBtn${g.key===sceneFilter?' on':''}" data-filter="${g.key}">${g.label}<span>${n}</span></button>`;
+    }).join('');
+    filterEl.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{sceneFilter=b.dataset.filter;renderCards();});
+  }
+  const cur=scenes[selectedScene]||scenes[0];
+  const pickedEl=document.getElementById('scenePicked');
+  if(pickedEl)pickedEl.innerHTML=sceneInFilter(cur[0])?'':`目前選的是：<b>${cur[1]}</b>（在其他分類）`;
+  sceneGrid.innerHTML=scenes.map((s,i)=>({s,i})).filter(({s})=>sceneInFilter(s[0])).map(({s,i},n)=>{
     let thumbHtml;
-    if(isCustom){
+    if(s[2]==='custom'){
       thumbHtml = `<div class="thumb custom"></div>`;
-    } else {
-      const sceneThumbFile = `${s[1]}.png`;
-      const imgPath = `./場景縮圖/${sceneThumbFile}`;
-      const fallbackImgPath = s[1] === '試試手氣' ? `./場景縮圖/試試手氣.png` : imgPath;
-      const bgStyle = s[1] === '試試手氣'
-        ? `background-image:url('${imgPath}?v=2'),url('${fallbackImgPath}?v=2')`
-        : `background-image:url('${imgPath}')`;
+    } else if(SCENE_THUMB_PHOTOS.has(s[0])){
+      const imgPath = `./場景縮圖/${s[1]}.${SCENE_THUMB_PHOTOS.get(s[0])}`+(s[0]==='lucky'?'?v=2':'');
+      const drawn = SCENE_THUMB_DRAWN[s[0]];
+      const bgStyle = drawn ? `background:url('${imgPath}') center/cover no-repeat,${drawn}` : `background-image:url('${imgPath}')`;
       thumbHtml = `<div class="thumb sceneImg ${s[0]}" style="${bgStyle}"></div>`;
+    } else {
+      thumbHtml = `<div class="thumb sceneImg drawn" style="background:${SCENE_THUMB_DRAWN[s[0]]||'#252b39'}"></div>`;
     }
     const riskBadge = s[4] ? `<div style="margin-top:4px;font-size:10px;font-weight:900;letter-spacing:.2px;color:${s[4].startsWith('⚠')?'#ff8a8a':'#7cf0bd'}">${s[4]}</div>` : '';
-    return `<div class="optionCard ${i===selectedScene?'active':''}" data-type="scene" data-i="${i}">${thumbHtml}<div class="optionTitle">${i+1}. ${s[1]}</div><div class="optionDesc">${s[3]}</div>${riskBadge}</div>`;
+    return `<div class="optionCard ${i===selectedScene?'active':''}" data-type="scene" data-i="${i}">${thumbHtml}<div class="optionTitle">${n+1}. ${s[1]}</div><div class="optionDesc">${s[3]}</div>${riskBadge}</div>`;
   }).join('');
-  purposeGrid.innerHTML=purposes.map((s,i)=>`<div class="optionCard ${i===selectedPurpose?'active':''}" data-type="purpose" data-i="${i}"><div class="thumb ${s[0]}"></div><div class="optionTitle">${i+1}. ${s[1]}</div><div class="optionDesc">${s[3]}</div><div style="margin-top:6px;font-size:10px;color:#8dd3ff;font-weight:700;letter-spacing:.3px">VISUAL STYLE PREVIEW</div></div>`).join('');
+  purposeGrid.innerHTML=purposes.map((s,i)=>`<div class="optionCard ${i===selectedPurpose?'active':''}" data-type="purpose" data-i="${i}"><div class="thumb ${s[0]}${PURPOSE_ILLUS[s[0]]?' illus':''}">${PURPOSE_ILLUS[s[0]]||''}</div><div class="optionTitle">${i+1}. ${s[1]}</div><div class="optionDesc">${s[3]}</div><div style="margin-top:6px;font-size:10px;color:#8dd3ff;font-weight:700;letter-spacing:.3px">VISUAL STYLE PREVIEW</div></div>`).join('');
   lightGrid.innerHTML=lights.map((l,i)=>`<div class="lightChip ${l[3]?'on':''}" data-i="${i}"><div class="lightIcon ${l[0]}"></div><div class="lightTxt">${l[1]}</div></div>`).join('');
-  document.querySelectorAll('.optionCard').forEach(c=>c.onclick=()=>{ if(c.dataset.type==='scene'){ selectedScene=+c.dataset.i; if(scenes[selectedScene][0]==='lucky') luckyStyleCache=''; } else selectedPurpose=+c.dataset.i; renderCards(); updateCustomVisibility(); leftChanged(); });
+  document.querySelectorAll('.optionCard').forEach(c=>c.onclick=()=>{ if(c.dataset.type==='scene'){ selectSceneByKey(scenes[+c.dataset.i][0]); return; } selectedPurpose=+c.dataset.i; renderCards(); updateCustomVisibility(); leftChanged(); });
   document.querySelectorAll('.lightChip').forEach(c=>c.onclick=()=>{ lights[+c.dataset.i][3]=!lights[+c.dataset.i][3]; renderCards(); leftChanged(); });
 }
 function fileBaseName(fileName){return fileName.replace(/\.[^/.]+$/,'').replace(/[_-]+/g,' ').trim();}
@@ -2673,6 +2804,38 @@ function getLayoutSpec(snapshot){
 }
 const KEY_LIGHT_TEXT={top:'from above and slightly in front',left:'from the upper left',right:'from the upper right'};
 function keyLightValue(){const v=document.getElementById('keyLight')?.value;return KEY_LIGHT_TEXT[v]?v:'top';}
+// ---- 主光源方向：圖示按鈕。寫入隱藏的 #keyLight，其餘程式（咒語、陰影、暫存檔）照舊讀它。 ----
+// Icon: a product on a floor, the sun in the chosen corner, the far side of the product shaded and its
+// shadow falling away from the light.
+function keyLightIcon(dir){
+  const sx={left:9,top:29,right:49}[dir], sy=8, shadowX={left:38,top:29,right:20}[dir];
+  const rays=[0,45,90,135,180,225,270,315].map(a=>{
+    const r=a*Math.PI/180, p=d=>[(sx+Math.cos(r)*d).toFixed(1),(sy+Math.sin(r)*d).toFixed(1)];
+    const [x1,y1]=p(5.5),[x2,y2]=p(7.5);return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+  }).join('');
+  return `<svg viewBox="0 0 58 40" aria-hidden="true">
+    <rect x="3" y="30" width="52" height="7" rx="3.5" fill="#262d3b"/>
+    <ellipse cx="${shadowX}" cy="32.5" rx="${dir==='top'?8:11}" ry="2.2" fill="#07090e"/>
+    <line x1="${sx}" y1="${sy}" x2="29" y2="14" stroke="#ffd166" stroke-width="1" stroke-dasharray="2 2" opacity=".55"/>
+    <rect x="24" y="14" width="10" height="18" rx="2.5" fill="#d7dee9"/>
+    ${dir==='top'?'<rect x="24" y="14" width="10" height="4" rx="2" fill="#fff"/>':`<rect x="${dir==='right'?24:29}" y="14" width="5" height="18" rx="2" fill="#8e99ab"/>`}
+    <g stroke="#ffd166" stroke-width="1.3" stroke-linecap="round">${rays}</g>
+    <circle cx="${sx}" cy="${sy}" r="3.8" fill="#ffd166"/>
+  </svg>`;
+}
+function syncKeyLightButtons(){
+  const v=keyLightValue();
+  document.querySelectorAll('.keyLightBtn').forEach(b=>{const on=b.dataset.light===v;b.classList.toggle('on',on);b.setAttribute('aria-checked',String(on));});
+}
+document.querySelectorAll('.keyLightBtn').forEach(b=>{
+  b.insertAdjacentHTML('afterbegin',keyLightIcon(b.dataset.light));
+  b.addEventListener('click',()=>{
+    const sel=document.getElementById('keyLight');if(!sel||sel.value===b.dataset.light)return;
+    sel.value=b.dataset.light;sel.dispatchEvent(new Event('change'));   // regenerates the prompt and the shadow preview
+  });
+});
+document.getElementById('keyLight')?.addEventListener('change',syncKeyLightButtons);
+syncKeyLightButtons();
 // Products in reading order (left → right). Position words are relative to the product group (products all sit
 // inside the central safe zone, so canvas-relative words would call everything "centre").
 function aiProductList(snapshot){
@@ -3033,10 +3196,8 @@ function setStyleRefModelUI(state){
 // scenes — so once a caption is generated, switch 場景風格 to 自訂場景 and pipe the caption
 // straight into its textarea, exactly as if the user had typed it there themselves.
 function applyCaptionToCustomScene(caption){
-  const customIdx = scenes.findIndex(s => s[0] === 'custom');
-  if(customIdx < 0) return;
-  const card = document.querySelector(`.optionCard[data-type="scene"][data-i="${customIdx}"]`);
-  if(card) card.click(); // reuses the existing selection logic (renderCards/updateCustomVisibility/leftChanged)
+  if(!scenes.some(s => s[0] === 'custom')) return;
+  selectSceneByKey('custom'); // same selection logic as clicking the card (renderCards/updateCustomVisibility/leftChanged)
   const cs = document.getElementById('customScene');
   if(cs){
     cs.value = caption;
@@ -3620,7 +3781,7 @@ function getLayoutState(){
   const styleImg=document.getElementById('styleRefPreviewImg');
   const styleRefData=location.hash==='#2'&&styleRefFile&&styleImg?.complete&&styleImg.naturalWidth?imagePNG(styleImg):'';
   return {version:'2.0',savedAt:new Date().toISOString(),selectedCanvasRatio,selectedScene,selectedPurpose,
-    purposeKey:(purposes[selectedPurpose]||purposes[0])[0],
+    sceneKey:(scenes[selectedScene]||scenes[0])[0],purposeKey:(purposes[selectedPurpose]||purposes[0])[0],
     customScene:customScene.value,customPurpose:customPurpose.value,lens:lens.value,angle:angle.value,lock:lock.value,
     lights:lights.map(l=>l[3]),keyLight:keyLightValue(),
     shadow:Object.fromEntries(SHADOW_SLIDERS.map(([k,id])=>[k,Number(document.getElementById(id)?.value)||0])),
@@ -3651,7 +3812,11 @@ async function restoreLayoutState(data){
   if(/^data:image\/png;base64,/.test(data.styleRefData||''))decodedStyle=await decodeAsset(data.styleRefData);
   getProductElements().forEach(p=>p.remove());productOriginalFiles.clear();canvasPositions.clear();active=null;
   selectedCanvasRatio=data.selectedCanvasRatio||'1/1';
-  selectedScene=Number.isInteger(data.selectedScene)&&scenes[data.selectedScene]?data.selectedScene:0;
+  // Restore by key: new styles were inserted, so older files' index (in the old 10-style order) is mapped by name.
+  const OLD_SCENE_ORDER=['white','beige','clean','window','gradient','season','tech','dark','lucky','custom'];
+  const sceneKey=typeof data.sceneKey==='string'?data.sceneKey:Number.isInteger(data.selectedScene)?OLD_SCENE_ORDER[data.selectedScene]:'';
+  const sceneIdx=scenes.findIndex(s=>s[0]===sceneKey);
+  selectedScene=sceneIdx>=0?sceneIdx:0;
   // Restore by key: the option order changed (豐富 now first). Older files only have the index in the old order.
   const OLD_PURPOSE_ORDER=['minimal','rich','random','custom'];
   const purposeKey=typeof data.purposeKey==='string'?data.purposeKey:Number.isInteger(data.selectedPurpose)?OLD_PURPOSE_ORDER[data.selectedPurpose]:'';
@@ -3665,6 +3830,7 @@ async function restoreLayoutState(data){
   luckyStyleCache=typeof data.luckyStyleCache==='string'?data.luckyStyleCache:'';
   if(Array.isArray(data.lights))data.lights.forEach((v,i)=>{if(lights[i])lights[i][3]=!!v;});
   if(KEY_LIGHT_TEXT[data.keyLight])document.getElementById('keyLight').value=data.keyLight;
+  syncKeyLightButtons();
   if(data.shadow&&typeof data.shadow==='object')SHADOW_SLIDERS.forEach(([k,id])=>{
     const v=Number(data.shadow[k]),el=document.getElementById(id);
     if(!el||!Number.isFinite(v))return;
@@ -5678,11 +5844,11 @@ manualOverlay.addEventListener('click',(e)=>{
       card.classList.add('active');
       const si = +card.dataset.si;
       selectedScene = si;
-      // Sync to desktop
-      const desktopCards = document.querySelectorAll('.optionCard[data-type="scene"]');
-      if(desktopCards[si]) desktopCards[si].click();
+      // Sync to desktop by key (the desktop list has more styles, in a different order)
+      const key = SCENES[si] && SCENES[si].key;
+      if(key && typeof selectSceneByKey === 'function') selectSceneByKey(key);
       // Show custom input
-      document.getElementById('mobCustomSceneWrap').style.display = si===9 ? '' : 'none';
+      document.getElementById('mobCustomSceneWrap').style.display = key==='custom' ? '' : 'none';
     });
   });
 
