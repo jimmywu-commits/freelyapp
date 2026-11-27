@@ -347,6 +347,13 @@ button:disabled{cursor:not-allowed;background:#2a2f3d!important;color:#6b7383!im
 .productItem .productMeta{grid-column:1/-1;display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center}
 .productMeta select{padding:5px 8px;font-size:12px;border-radius:9px}
 .productMeta select.unknown{border-color:#ffd166;color:#ffd166}
+.productItem .productMeta{grid-template-columns:1fr auto auto auto}
+.productMeta .productReason{grid-column:1/-1;font-size:10.5px;color:#7f8aa0;line-height:1.4;margin-top:-2px}
+.productMeta .productReason.warn{color:#ffd166}
+.productMeta .specInput{grid-column:1/-1;padding:6px 8px;font-size:12px;border-radius:9px}
+.miniBtn.specBtn.on{background:#8dd3ff;color:#06101a;border-color:#8dd3ff}
+.smartMemoryRow{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:8px;font-size:11px;color:#9aa3b2}
+.smartMemoryRow button{width:auto;padding:0;border:0;background:none;color:#8dd3ff;font-size:11px;font-weight:700;text-decoration:underline;cursor:pointer}
 .tierBadge{font-size:10px;font-weight:900;padding:3px 7px;border-radius:999px;background:#252b39;color:#8dd3ff;white-space:nowrap}
 .miniBtn.featBtn.active-feat{background:#ff9fd0;color:#06101a;border-color:#ff9fd0;font-weight:900}
 .smartLayoutBox{margin-top:10px;padding:12px;border-radius:14px;border:1px solid rgba(124,240,189,.3);background:rgba(124,240,189,.05)}
@@ -650,6 +657,38 @@ button:disabled{cursor:not-allowed;background:#2a2f3d!important;color:#6b7383!im
 .stepTabs{display:flex;gap:8px;margin-bottom:16px}
 .stepTab{padding:6px 16px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid var(--line);color:#9aa3b2;background:transparent;cursor:pointer}
 .stepTab.on{background:#252b39;color:#8dd3ff;border-color:#8dd3ff}
+/* Upload step ② 商品類別: auto-detected, every pick optional */
+.catIntro{font-size:12px;color:#9aa3b2;line-height:1.7;background:rgba(124,240,189,.06);border:1px solid rgba(124,240,189,.22);border-radius:10px;padding:8px 12px;margin-bottom:12px}
+.catIntro b{color:#7cf0bd}
+.catCard{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;border:1px solid var(--line);border-left:3px solid #7cf0bd;border-radius:14px;background:#11141c;padding:10px;margin-bottom:10px}
+.catCard.unknown{border-left-color:#ffd166}
+.catCard>img{width:96px;height:96px;object-fit:contain;background:#181c28;border-radius:10px}
+.catBody{min-width:0;display:grid;gap:7px}
+.catHead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.catHead .catName{font-size:15px;color:#f5f7fb}
+.catCard.unknown .catHead .catName{color:#ffd166}
+.catHead .catTier{font-size:11px;font-weight:900;padding:2px 8px;border-radius:999px;background:#252b39;color:#8dd3ff}
+.catHead .catWhy{font-size:11px;color:#7f8aa0}
+.catHead .catAuto{width:auto;padding:2px 8px;font-size:11px;background:transparent;border:1px solid var(--line);color:#9aa3b2;border-radius:999px}
+.catBody .catInfo{padding:7px 10px;font-size:12px;border-radius:9px}
+.catGroups,.catSubs{display:flex;flex-wrap:wrap;gap:6px}
+.catGroups button,.catSubs button{width:auto;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:700;background:#1a1f2b;border:1px solid #333b4d;color:#c9d2e0}
+.catGroups button.on{background:#7cf0bd;border-color:#7cf0bd;color:#06101a}
+.catGroups button.open:not(.on){border-color:#7cf0bd;color:#7cf0bd}
+.catSubs{padding:8px;border-radius:10px;background:#0d1016;border:1px dashed #2b3040}
+.catSubs button{padding:4px 9px;font-size:11px;font-weight:600}
+.catSubs button.on{background:#8dd3ff;border-color:#8dd3ff;color:#06101a}
+.catSubs button.catOnlyGroup{border-style:dashed;color:#9aa3b2}
+.catSubs button.catOnlyGroup.on{color:#06101a}
+.catPaste{margin:4px 0 10px;font-size:12px;color:#9aa3b2}
+.catPaste summary{cursor:pointer;color:#8dd3ff;font-weight:700;padding:4px 0}
+.catPaste textarea{margin:6px 0;font-size:12px;min-height:84px}
+.catPaste button{width:auto;padding:7px 14px;font-size:12px}
+.catPasteNote{margin-left:8px;color:#7cf0bd}
+.catSummary{font-size:12px;line-height:1.6;border-radius:10px;padding:8px 12px}
+.catSummary.warn{color:#ffd166;background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.25)}
+.catSummary.ok{color:#7cf0bd;background:rgba(124,240,189,.07);border:1px solid rgba(124,240,189,.25)}
+@media(max-width:600px){.catCard{grid-template-columns:64px 1fr}.catCard>img{width:64px;height:64px}}
 
 /* === Triangle Compose Button & Shuffle === */
 .composeRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
@@ -1234,6 +1273,13 @@ html,body{height:100%;overflow:hidden}
   </div>
   <button type="button" class="secondary" id="smartShuffleBtn">⟳ 換一組</button>
   <p id="smartLayoutHint" role="status"></p>
+  <div class="smartMemoryRow" title="手動選過的類別會記在這台電腦，下次遇到同樣或相似的商品名稱會自動套用">
+    <span>分類記憶：已記住 <b id="smartMemoryCount">0</b> 筆</span>
+    <button type="button" id="smartMemoryExport">匯出</button>
+    <button type="button" id="smartMemoryImportBtn">匯入</button>
+    <button type="button" id="smartMemoryClear">清除</button>
+    <input type="file" id="smartMemoryImport" accept="application/json,.json" hidden>
+  </div>
 </div>
 
 <div id="styleRefSection" class="hidden">
@@ -1795,7 +1841,7 @@ async function addProductFromFile(file){
   raw=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=normalizedSrc;});
   const trim=autoTrimImage(raw);
   const index=getProductElements().length;
-  const box=document.createElement('div');box.className='product'+(trim.trimmed?' trimmed':'');box.dataset.id=id;box.dataset.name=name;box.dataset.filename=file.name;box.dataset.ref='REF-'+String(index+1).padStart(2,'0');box.dataset.ratio=trim.ratio;box.dataset.category=guessProductCategory(file.name);
+  const box=document.createElement('div');box.className='product'+(trim.trimmed?' trimmed':'');box.dataset.id=id;box.dataset.name=name;box.dataset.filename=file.name;box.dataset.ref='REF-'+String(index+1).padStart(2,'0');box.dataset.ratio=trim.ratio;writeProductClass(box,smartRecord(smartInfoFromFileName(file.name)));
   const baseW=24, baseH=baseW/trim.ratio*ratioValue(selectedCanvasRatio);
   const initRect=clampRectToSafeZone(15+(index%3)*23, 56+(index%2)*9, baseW, baseH);
   box.style.cssText=`left:${initRect.left}%;top:${initRect.top}%;width:${initRect.w}%;height:${initRect.h}%`;
@@ -1850,17 +1896,17 @@ const PRODUCT_SIZE_DB=[
  ['hair_dryer','個人護理','吹風機',25,22,'吹風機|風筒|電吹風|hair dryer|hairdryer|blow dryer'],
  ['hair_styler','個人護理','離子夾／捲髮器',6,30,'離子夾|直髮夾|捲髮器|電捲棒|整髮器|造型夾|curling iron|hair straightener|hair styler'],
  ['shaver','個人護理','刮鬍刀',7,16,'刮鬍刀|電動刮鬍刀|剃鬚刀|shaver|razor'],
- ['toothbrush','個人護理','電動牙刷／沖牙機',3,24,'電動牙刷|牙刷|沖牙機|toothbrush|water flosser'],
+ ['toothbrush','個人護理','電動牙刷／沖牙機',3,24,'電動牙刷|牙刷|沖牙機|toothbrush|water flosser|sonicare'],
  ['massage_gun','個人護理','按摩槍',18,25,'按摩槍|筋膜槍|massage gun'],
  ['body_scale','個人護理','體重計',30,30,'體重計|體脂計|body scale'],
  ['laptop','3C 電子','筆電',31,22,'筆電|筆記型電腦|筆記本電腦|laptop|notebook|macbook'],
- ['monitor','3C 電子','螢幕',60,45,'螢幕|顯示器|電腦螢幕|monitor'],
+ ['monitor','3C 電子','螢幕',60,45,'螢幕|顯示器|電腦螢幕|monitor|imac'],
  ['desktop_pc','3C 電子','電腦主機',20,42,'桌機|電腦主機|桌上型電腦|desktop pc'],
- ['tablet','3C 電子','平板',18,25,'平板|平板電腦|tablet|ipad'],
+ ['tablet','3C 電子','平板',18,25,'平板|平板電腦|tablet|ipad|kindle'],
  ['phone','3C 電子','手機',7.5,15,'手機|智慧型手機|smartphone|iphone|phone'],
  ['smartwatch','3C 電子','手錶／手環',5,18,'手錶|智慧手錶|運動手錶|手環|smartwatch|watch'],
  ['earbuds','3C 電子','藍牙耳機',6,5,'藍牙耳機|無線耳機|真無線|耳機|earbuds|airpods|earphones'],
- ['headphones','3C 電子','耳罩式耳機',17,19,'耳罩式耳機|頭戴式耳機|電競耳機|headphones|headset'],
+ ['headphones','3C 電子','耳罩式耳機',17,19,'耳罩式耳機|頭戴式耳機|電競耳機|headphones|headset|airpods max'],
  ['speaker','3C 電子','藍牙喇叭',18,20,'藍牙喇叭|喇叭|音響|speaker'],
  ['soundbar','3C 電子','聲霸',90,7,'聲霸|soundbar'],
  ['keyboard','3C 電子','鍵盤',44,13,'鍵盤|機械鍵盤|keyboard'],
@@ -1869,7 +1915,7 @@ const PRODUCT_SIZE_DB=[
  ['power_bank','3C 電子','行動電源',7,14,'行動電源|充電寶|power bank|powerbank'],
  ['charger','3C 電子','充電器',5,6,'充電器|充電頭|快充頭|charger|adapter'],
  ['cable','3C 電子','傳輸線',10,10,'傳輸線|充電線|cable'],
- ['camera','3C 電子','相機',13,9,'相機|單眼|微單|類單眼|拍立得|camera'],
+ ['camera','3C 電子','相機',13,9,'相機|單眼|微單|類單眼|拍立得|camera|gopro|instax'],
  ['game_console','3C 電子','遊戲主機',26,39,'遊戲主機|主機|ps5|playstation|xbox'],
  ['handheld_console','3C 電子','掌機',24,10,'掌機|switch|steam deck'],
  ['router','3C 電子','路由器',22,18,'路由器|分享器|router'],
@@ -1896,7 +1942,7 @@ const PRODUCT_SIZE_DB=[
  ['snack_bag','食品保健','零食（袋裝）',18,25,'洋芋片|餅乾|零食|堅果|chips|snack|cookies'],
  ['gift_box','食品保健','禮盒',30,22,'禮盒|伴手禮|gift box|gift set'],
  ['milk_powder','食品保健','奶粉罐',13,18,'奶粉|奶粉罐|formula|milk powder'],
- ['coffee_pack','食品保健','咖啡豆／濾掛',12,20,'咖啡豆|濾掛|即溶咖啡|咖啡包|coffee beans|instant coffee'],
+ ['coffee_pack','食品保健','咖啡豆／濾掛',12,20,'咖啡豆|濾掛|即溶咖啡|咖啡包|咖啡膠囊|coffee beans|instant coffee|coffee capsule'],
  ['supplement','食品保健','保健食品',7,12,'保健|保健食品|膠囊|維他命|維生素|益生菌|魚油|葉黃素|vitamin|supplement|probiotic'],
  ['stroller','母嬰居家','嬰兒車',55,100,'嬰兒車|推車|stroller|pram'],
  ['diapers','母嬰居家','尿布',35,40,'尿布|紙尿褲|diaper|diapers'],
@@ -1914,10 +1960,10 @@ const PRODUCT_SIZE_DB=[
  ['clothing','服飾配件','衣服',50,65,'上衣|T恤|衣服|外套|洋裝|襯衫|褲子|shirt|t-shirt|jacket|dress'],
  ['sunglasses','服飾配件','眼鏡',14,5,'太陽眼鏡|墨鏡|眼鏡|sunglasses|glasses'],
  ['cap','服飾配件','帽子',25,14,'帽子|棒球帽|cap|hat'],
- ['tier_xl','依大小（清單沒有的商品）','特大（大家電等級）',100,100,''],
- ['tier_l','依大小（清單沒有的商品）','大',45,45,''],
- ['tier_m','依大小（清單沒有的商品）','中（小家電等級）',22,22,''],
- ['tier_s','依大小（清單沒有的商品）','小（3C、保養品等級）',10,10,''],
+ ['tier_xl','依大小（清單沒有的商品）','特大（大家電等級）',100,100,'大型家電|大家電'],
+ ['tier_l','依大小（清單沒有的商品）','大',45,45,'生活家電'],
+ ['tier_m','依大小（清單沒有的商品）','中（小家電等級）',22,22,'小家電|廚房家電|個人護理'],
+ ['tier_s','依大小（清單沒有的商品）','小（3C、保養品等級）',10,10,'3c配件|手機配件|電腦周邊|美妝|保養品|彩妝'],
  ['tier_xs','依大小（清單沒有的商品）','特小（口紅、耳機等級）',4.5,4.5,'']
 ];
 const PRODUCT_SIZE_INDEX=new Map(PRODUCT_SIZE_DB.map(e=>[e[0],e]));
@@ -1926,28 +1972,30 @@ const SMART_DEFAULT_CATEGORY='tier_m';
 function productCategoryEntry(id){return PRODUCT_SIZE_INDEX.get(id)||PRODUCT_SIZE_INDEX.get(SMART_DEFAULT_CATEGORY);}
 function productRealSize(id){const e=productCategoryEntry(id);return Math.sqrt(e[3]*e[4]);}
 function productSizeTier(id){
-  const s=productRealSize(id);
+  const s=typeof id==='number'?id:productRealSize(id);
   return s>=60?'特大':s>=30?'大':s>=15?'中':s>=7?'小':'特小';
 }
 // Longest alias wins, so 「滑鼠墊」 beats 「滑鼠」 and 「電熱水壺」 beats 「水壺」.
 // Latin aliases need word boundaries ("phone" must not match "headphone"); CJK aliases use substring match.
-function guessProductCategory(text){
-  const s=String(text||'').toLowerCase();
-  if(!s)return '';
-  let best='',bestLen=0;
+// Generic size tiers (aliases such as 大型家電 from a pasted category path) are only a fallback.
+function escapeRegExp(str){return str.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function aliasHit(s,a){
+  return /^[\x00-\x7f]+$/.test(a)?new RegExp('(^|[^a-z0-9])'+escapeRegExp(a)+'($|[^a-z0-9])').test(s):s.includes(a);
+}
+function guessKeyword(text,{tiers=false}={}){
+  const s=String(text||'').normalize('NFKC').toLowerCase();
+  if(!s)return null;
+  let best=null,bestLen=0;
   for(const e of PRODUCT_SIZE_DB){
-    if(!e[5])continue;
+    if(!e[5]||e[0].startsWith('tier_')!==tiers)continue;
     for(const alias of e[5].split('|')){
       const a=alias.toLowerCase();
-      if(!a||a.length<=bestLen)continue;
-      const hit=/^[\x00-\x7f]+$/.test(a)
-        ? new RegExp('(^|[^a-z0-9])'+a.replace(/[.*+?^${}()|[\]\\]/g,'\\function refreshRefs(){')+'($|[^a-z0-9])').test(s)
-        : s.includes(a);
-      if(hit){best=e[0];bestLen=a.length;}
+      if(a&&a.length>bestLen&&aliasHit(s,a)){best={id:e[0],alias};bestLen=a.length;}
     }
   }
   return best;
 }
+function guessProductCategory(text){const k=guessKeyword(text)||guessKeyword(text,{tiers:true});return k?k.id:'';}
 
 // ---- Placement rules ----
 // Real-world scale is compressed (size^0.45) so a mouse next to a fridge stays legible:
@@ -2075,32 +2123,288 @@ function smartLayoutPlan(items,{sz,R,variant=0,occlusion='low'}){
 }
 
 
+// ---- 商品分類：名稱／規格解析 + 型號字典 + 使用者記憶（不需要 AI 模型或 API）----
+// Order of evidence: remembered exact name > brand model/series > remembered token > keyword in the
+// name > category path (大型家電…) > size from a spec alone. A stated spec (70x65x170cm, 55吋, 500公升,
+// 30ml, 12公斤) refines the size of whatever category was found.
+
+// Brand model / series dictionary: [pattern, category, label, brand context (optional), inch capture group (optional)].
+// Patterns marked with a brand only count when the brand also appears in the text. Extend freely.
+const PRODUCT_MODEL_DB=[
+ [/\bNR-[A-Z]/i,'refrigerator','Panasonic 冰箱型號 NR-'],
+ [/\bNA-[A-Z]/i,'washer','Panasonic 洗衣機型號 NA-'],
+ [/\bNN-[A-Z]{2}/i,'microwave','Panasonic 微波爐型號 NN-'],
+ [/\bSR-[A-Z]{2,3}\d/i,'rice_cooker','Panasonic 電子鍋型號 SR-'],
+ [/\bEH-N[A-Z]\d/i,'hair_dryer','Panasonic 吹風機型號 EH-N'],
+ [/\bF-P[A-Z0-9]{3}/i,'air_purifier','Panasonic 清淨機型號 F-P'],
+ [/\bF-Y[A-Z0-9]{3}/i,'dehumidifier','Panasonic 除濕機型號 F-Y'],
+ [/\bTH-(\d{2})[A-Z]/i,'tv','Panasonic 電視型號 TH-',null,1],
+ [/\bR[TSFB]\d{2}[A-Z]/i,'refrigerator','Samsung 冰箱型號',/samsung|三星/i],
+ [/\bW[WDA]\d{2}[A-Z]/i,'washer','Samsung 洗衣機型號',/samsung|三星/i],
+ [/\bDV\d{2}[A-Z]/i,'dryer','Samsung 乾衣機型號',/samsung|三星/i],
+ [/\b[UQ]A(\d{2})[A-Z]/i,'tv','Samsung 電視型號',/samsung|三星/i,1],
+ [/\bGR-[A-Z]/i,'refrigerator','LG 冰箱型號 GR-',/(^|[^a-z])lg([^a-z]|$)|樂金/i],
+ [/\bW[DT]-[A-Z0-9]/i,'washer','LG 洗衣機型號',/(^|[^a-z])lg([^a-z]|$)|樂金/i],
+ [/\bOLED(\d{2})[A-Z]/i,'tv','OLED 電視型號',null,1],
+ [/\b(?:KM|KD|XRM|XR)-(\d{2})[A-Z]/i,'tv','Sony 電視型號',null,1],
+ [/\bWH-1000XM\d/i,'headphones','Sony WH-1000XM'],
+ [/\bWF-1000XM\d/i,'earbuds','Sony WF-1000XM'],
+ [/supersonic/i,'hair_dryer','Dyson Supersonic'],
+ [/airwrap/i,'hair_styler','Dyson Airwrap'],
+ [/corrale/i,'hair_styler','Dyson Corrale'],
+ [/\bv(?:8|10|11|12|15)\b/i,'stick_vacuum','Dyson V 系列',/dyson|戴森/i],
+ [/\b(?:hp|tp|ph)\d{2}\b|purifier/i,'air_purifier','Dyson 清淨機',/dyson|戴森/i],
+ [/\bHX\d{4}/i,'toothbrush','Philips 牙刷型號 HX',/philips|飛利浦|sonicare/i],
+ [/\bmx\s?master/i,'mouse','Logitech MX Master'],
+ [/\bmx\s?keys/i,'keyboard','Logitech MX Keys'],
+ [/\bM\d{3}\b/i,'mouse','Logitech 滑鼠型號 M',/logitech|logi|羅技/i],
+ [/\bK\d{3}\b/i,'keyboard','Logitech 鍵盤型號 K',/logitech|logi|羅技/i],
+ [/\bapple\s?watch/i,'smartwatch','Apple Watch']
+];
+function matchModelDb(text){
+  for(const [re,category,label,brand,inchGroup] of PRODUCT_MODEL_DB){
+    if(brand&&!brand.test(text))continue;
+    const m=text.match(re);
+    if(m)return {category,label,inch:inchGroup?parseFloat(m[inchGroup]):null};
+  }
+  return null;
+}
+
+// A stated capacity / weight scales the category's typical size by the cube root of (amount ÷ typical amount).
+// Appliances are much bigger outside than their capacity, so their own typical capacity is the reference.
+const SMART_REF_ML={refrigerator:450000,mini_fridge:120000,air_fryer:5000,kettle:1700,thermo_pot:4000,rice_cooker:1800,
+  blender:1500,coffee_machine:1200,tumbler:500,bottled_drink:600,drink_can:330,toner:150,lotion:150,serum:30,
+  cleanser:120,sunscreen:50,foundation:30,body_wash:700,perfume:50,hand_cream:50,detergent:2000,baby_bottle:240};
+const SMART_REF_G={washer:12000,dryer:9000,cream:50,cushion:15,milk_powder:800,snack_bag:100,coffee_pack:250,pet_food:2000};
+const SMART_SCREEN_CATS=new Set(['tv','monitor','laptop','tablet','phone','handheld_console']);
+
+function smartTierForSize(s){return s>=60?'tier_xl':s>=30?'tier_l':s>=15?'tier_m':s>=7?'tier_s':'tier_xs';}
+// category: a specific category id, or '' when unknown (then absolute formulas are used).
+function parseSpecSize(text,category){
+  const t=String(text||'').normalize('NFKC');
+  const pre='(?:[a-z寬長高深厚]\\s*)?', num='(\\d+(?:\\.\\d+)?)', x='\\s*[x×*✕]\\s*';
+  // 1) Explicit dimensions: 70x65x170cm, W70×D65×H170 公分, 300*200mm — the two largest form the visible face.
+  const d=t.match(new RegExp(pre+num+x+pre+num+'(?:'+x+pre+num+')?\\s*(cm|公分|mm|毫米)','i'));
+  if(d){
+    const k=/mm|毫米/i.test(d[4])?0.1:1;
+    const v=[d[1],d[2],d[3]].filter(Boolean).map(n=>parseFloat(n)*k).sort((a,b)=>b-a);
+    const s=Math.sqrt(v[0]*v[1]);
+    if(s>=1&&s<=400)return {sizeCm:s,detail:d[0].trim()};
+  }
+  const hh=t.match(/(?:高度?|height|(?:^|[^a-z])h)\s*[:：]?\s*(\d+(?:\.\d+)?)\s*(cm|公分|mm)/i);
+  const ww=t.match(/(?:寬度?|width|(?:^|[^a-z])w)\s*[:：]?\s*(\d+(?:\.\d+)?)\s*(cm|公分|mm)/i);
+  if(hh&&ww){
+    const f=m=>parseFloat(m[1])*(/mm/i.test(m[2])?0.1:1), s=Math.sqrt(f(hh)*f(ww));
+    if(s>=1&&s<=400)return {sizeCm:s,detail:hh[0].trim()+' '+ww[0].trim()};
+  }
+  // 2) Screen diagonal in inches (16:9 face ≈ 1.66 × inches cm); luggage inches are its height.
+  const inch=t.match(/(\d{1,3}(?:\.\d)?)\s*(?:吋|寸|英吋|inch(?:es)?|”|″|"|型)/i);
+  if(inch){
+    const v=parseFloat(inch[1]);
+    if(category==='luggage'&&v>=14&&v<=36)return {sizeCm:2.05*v,detail:inch[0].trim()};
+    if((!category||SMART_SCREEN_CATS.has(category))&&v>=3&&v<=120)return {sizeCm:1.66*v,detail:inch[0].trim()};
+  }
+  // 3) Capacity or net weight. Uppercase G is a network generation (5G), not grams.
+  const vol=t.match(/(\d+(?:\.\d+)?)\s*(ml|毫升|cc|公升|升|l)(?![a-z])/i);
+  const wt=t.match(/(\d+(?:\.\d+)?)\s*(kg|KG|Kg|公斤|g|公克|克)(?![a-zA-Z])/);
+  const scaled=(ref,amount,label)=>({sizeCm:productRealSize(category)*Math.min(2.5,Math.max(0.4,Math.cbrt(amount/ref))),detail:label});
+  if(vol){
+    const ml=parseFloat(vol[1])*(/^(公升|升|l)$/i.test(vol[2])?1000:1);
+    if(ml>0&&category&&SMART_REF_ML[category])return scaled(SMART_REF_ML[category],ml,vol[0].trim());
+    if(ml>0&&!category)return {sizeCm:1.5*Math.cbrt(ml),detail:vol[0].trim()};
+  }
+  if(wt){
+    const g=parseFloat(wt[1])*(/^(kg|公斤)$/i.test(wt[2])?1000:1);
+    if(g>0&&category&&SMART_REF_G[category])return scaled(SMART_REF_G[category],g,wt[0].trim());
+    if(g>0&&!category)return {sizeCm:1.5*Math.cbrt(g),detail:wt[0].trim()};
+  }
+  return null;
+}
+
+// ---- 使用者記憶：手動選過的類別會記住，下次自動套用 ----
+const SMART_STOPWORDS=['公司貨','現貨','新品','限定','官方','正品','特價','免運','熱銷','組合','套組','系列','升級版','旗艦','禮物','送禮','原廠','保固','台灣','福利品','預購'];
+const SMART_CJK_ALIASES=PRODUCT_SIZE_DB.flatMap(e=>e[5]?e[5].split('|'):[]).filter(a=>/[㐀-鿿]/.test(a));
+function smartNormKey(text){
+  return String(text||'').normalize('NFKC').toLowerCase()
+    .replace(/\.(png|jpe?g|webp|avif|gif|bmp|svg)$/,'').replace(/[\s_\-.,，、/\\|()[\]{}（）【】「」]+/g,'');
+}
+// Distinctive pieces worth remembering: model numbers (nr-b501, m331) and new CJK product words (青春露).
+// Generic words already in the dictionary, spec amounts and marketing stopwords are never learned.
+function smartLearnTokens(text){
+  const t=String(text||'').normalize('NFKC').toLowerCase(),out=new Set();
+  t.split(/[^a-z0-9-]+/).forEach(w=>{
+    w=w.replace(/^-+|-+$/g,'');
+    if(w.length>=4&&/[a-z]/.test(w)&&/\d/.test(w)&&!/^\d+(\.\d+)?(ml|l|g|kg|cm|mm|w|mah|gb|tb|pcs|cc)$/.test(w))out.add(w);
+  });
+  (t.match(/[㐀-鿿]{3,8}/g)||[]).forEach(run=>{
+    if(SMART_STOPWORDS.some(w=>run.includes(w))||SMART_CJK_ALIASES.some(a=>run.includes(a)))return;
+    out.add(run);
+  });
+  return [...out];
+}
+function learnProductCategory(memory,text,category){
+  memory.names=memory.names||{};memory.tokens=memory.tokens||{};
+  const key=smartNormKey(text);
+  if(!category||!key)return memory;
+  if(key.length>=2){delete memory.names[key];memory.names[key]=category;}
+  smartLearnTokens(text).forEach(tok=>{delete memory.tokens[tok];memory.tokens[tok]=category;});
+  const cap=(o,n)=>{const k=Object.keys(o);k.slice(0,Math.max(0,k.length-n)).forEach(x=>delete o[x]);};
+  cap(memory.names,400);cap(memory.tokens,800);
+  return memory;
+}
+function matchMemoryToken(text,memory){
+  if(!memory||!memory.tokens)return null;
+  const t=String(text||'').normalize('NFKC').toLowerCase();
+  let best=null;
+  for(const [tok,cat] of Object.entries(memory.tokens)){
+    if(!PRODUCT_SIZE_INDEX.has(cat)||(best&&tok.length<=best.token.length))continue;
+    const hit=/[㐀-鿿]/.test(tok)?t.includes(tok):new RegExp('(^|[^a-z0-9])'+escapeRegExp(tok)+'($|[^a-z0-9])').test(t);
+    if(hit)best={token:tok,category:cat};
+  }
+  return best;
+}
+
+// Returns {category, source, detail, sizeCm, sizeDetail}. source: memory | model | keyword | group | spec | none.
+function classifyProductText(text,memory){
+  const t=String(text||'').normalize('NFKC');
+  let category='',source='none',detail='',inch=null;
+  const named=memory&&memory.names&&memory.names[smartNormKey(t)];
+  if(named&&PRODUCT_SIZE_INDEX.has(named)){category=named;source='memory';detail='這個名稱';}
+  if(!category){const m=matchModelDb(t);if(m){category=m.category;source='model';detail=m.label;inch=m.inch;}}
+  if(!category){const m=matchMemoryToken(t,memory);if(m){category=m.category;source='memory';detail=m.token;}}
+  if(!category){const k=guessKeyword(t);if(k){category=k.id;source='keyword';detail=k.alias;}}
+  if(!category){const k=guessKeyword(t,{tiers:true});if(k){category=k.id;source='group';detail=k.alias;}}
+  return withSpecSize(t,{category,source,detail},inch);
+}
+// Same record for a category the user picked by hand; the spec still refines a specific category's size,
+// but a hand-picked size class (特大／大／中…) is taken as is.
+function manualProductClass(text,category){
+  if(String(category||'').startsWith('tier_'))return {category,source:'manual',detail:'',sizeCm:null,sizeDetail:''};
+  return withSpecSize(String(text||'').normalize('NFKC'),{category,source:'manual',detail:''},null);
+}
+function withSpecSize(t,r,inch){
+  const specific=r.category&&!r.category.startsWith('tier_')?r.category:'';
+  let size=parseSpecSize(t,specific);
+  if(!size&&inch)size={sizeCm:1.66*inch,detail:inch+' 吋'};
+  if(!r.category&&size){r.category=smartTierForSize(size.sizeCm);r.source='spec';r.detail=size.detail;}
+  return {...r,sizeCm:size?Math.round(size.sizeCm*10)/10:null,sizeDetail:size?size.detail:''};
+}
+
 // ---- 智慧擺品：介面 ----
 const SMART_CATEGORY_OPTIONS=(()=>{
   const groups=new Map();
   PRODUCT_SIZE_DB.forEach(e=>{if(!groups.has(e[1]))groups.set(e[1],[]);groups.get(e[1]).push(e);});
-  return '<option value="">未辨識（當作中型）</option>'+[...groups].map(([g,list])=>
+  return '<option value="">自動判斷</option>'+[...groups].map(([g,list])=>
     '<optgroup label="'+g+'">'+list.map(e=>'<option value="'+e[0]+'">'+e[2]+'</option>').join('')+'</optgroup>').join('');
 })();
 function productCategoryOptions(selected){
   return SMART_CATEGORY_OPTIONS.replace('value="'+selected+'"','value="'+selected+'" selected');
 }
+// One-tap groups for the upload picker. Picking only a group gives that group's typical size.
+const SMART_UI_GROUPS=[
+  {key:'big',label:'大家電',db:['大型家電'],fallback:'tier_xl'},
+  {key:'home',label:'生活家電',db:['生活家電'],fallback:'tier_l'},
+  {key:'small',label:'小家電',db:['廚房家電','個人護理'],fallback:'tier_m'},
+  {key:'tech',label:'3C',db:['3C 電子'],fallback:'tier_s'},
+  {key:'beauty',label:'美妝保養',db:['美妝保養'],fallback:'tier_s'},
+  {key:'other',label:'其他',db:['食品保健','母嬰居家','服飾配件'],fallback:'tier_m'}
+];
+// Group of a specific category. Size classes (tier_*) are shared by several groups, so they have none here;
+// the upload picker remembers which group the user tapped instead.
+function smartGroupOf(category){
+  const e=PRODUCT_SIZE_INDEX.get(category);if(!e||category.startsWith('tier_'))return null;
+  return SMART_UI_GROUPS.find(g=>g.db.includes(e[1]))||null;
+}
+
+// ---- Classification record kept on each product (and on staged uploads) ----
+// {info, category, source, detail, sizeCm, sizeDetail}; source: manual|memory|model|keyword|group|spec|none
+const SMART_MEMORY_KEY='freelyCategoryMemory_v1';
+let smartMemory=(()=>{try{const m=JSON.parse(localStorage.getItem(SMART_MEMORY_KEY)||'null');if(m&&typeof m==='object')return {names:m.names||{},tokens:m.tokens||{}};}catch(e){}return {names:{},tokens:{}};})();
+function saveSmartMemory(){try{localStorage.setItem(SMART_MEMORY_KEY,JSON.stringify(smartMemory));}catch(e){}updateMemoryStatus();}
+function smartRecord(info,manualCategory){
+  const r=manualCategory?manualProductClass(info,manualCategory):classifyProductText(info,smartMemory);
+  return {info:String(info||''),...r};
+}
+// File names use _ and - as separators; keep hyphens (model numbers like NR-B501) but split on underscores.
+function smartInfoFromFileName(name){return String(name||'').replace(/\.[^/.]+$/,'').replace(/_+/g,' ').trim();}
+function writeProductClass(el,r){
+  el.dataset.info=r.info||'';el.dataset.category=r.category||'';el.dataset.catSource=r.source||'none';el.dataset.catDetail=r.detail||'';
+  if(r.sizeCm)el.dataset.sizeCm=String(r.sizeCm);else delete el.dataset.sizeCm;
+  el.dataset.sizeDetail=r.sizeDetail||'';
+}
+function readProductClass(el){
+  const d=el.dataset;
+  return {info:d.info||'',category:d.category||'',source:d.catSource||(d.category?'keyword':'none'),detail:d.catDetail||'',
+    sizeCm:parseFloat(d.sizeCm)||null,sizeDetail:d.sizeDetail||''};
+}
+// Learn from a hand-picked category so the same or similar name is recognised next time.
+function rememberProductClass(info,category){
+  if(!info||!category)return;
+  learnProductCategory(smartMemory,info,category);saveSmartMemory();
+}
+function productSizeOf(rec){return rec.sizeCm||productRealSize(rec.category);}
+function productTierLabel(rec){return productSizeTier(productSizeOf(rec));}
+function productClassReason(rec){
+  const why={manual:'你選的',memory:'依記憶「'+rec.detail+'」',model:'依型號「'+rec.detail+'」',keyword:'依名稱「'+rec.detail+'」',
+    group:'依類目「'+rec.detail+'」',spec:'依規格「'+rec.detail+'」',none:'認不出來，先當中型'}[rec.source]||'';
+  return why+(rec.sizeDetail&&rec.source!=='spec'?'・大小依「'+rec.sizeDetail+'」':'');
+}
+function productClassName(rec){
+  if(!rec.category)return '未分類';
+  const e=PRODUCT_SIZE_INDEX.get(rec.category);
+  return e&&!rec.category.startsWith('tier_')?e[2]:'尺寸：'+productTierLabel(rec);
+}
+
+const smartSpecOpen=new Set();   // product ids whose ✎ name/spec box is open in the list
+let smartLayoutDirty=false;       // a category/spec changed since the last smart layout
+function smartEscape(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function updateSmartHint(){
   const el=document.getElementById('smartLayoutHint');if(!el)return;
   const ps=getProductElements();
   if(!ps.length){el.textContent='';return;}
-  const unknown=ps.filter(p=>!p.dataset.category).length;
-  const sizes=ps.map(p=>productRealSize(p.dataset.category));
+  const recs=ps.map(readProductClass);
+  const unknown=recs.filter(r=>!r.category).length;
+  const sizes=recs.map(productSizeOf);
   const parts=[];
-  if(unknown)parts.push(unknown+' 件商品認不出類別（目前當作中型），請在上方清單選擇。');
-  if(ps.length>1&&Math.max(...sizes)/Math.min(...sizes)>=3)parts.push('商品大小差很多，建議按「智慧擺品」依實際大小排列。');
+  if(unknown)parts.push(unknown+' 件商品認不出類別（目前當作中型），可在上方清單選擇，或按 ✎ 貼上商品名稱／規格。');
+  // currentLayoutMode lives in a later <script>; guard in case this runs before it loads.
+  const smartMode=typeof currentLayoutMode!=='undefined'&&currentLayoutMode==='smart';
+  if(smartMode&&smartLayoutDirty)parts.push('類別或規格有變更，按「✦ 智慧擺品」重新排列。');
+  else if(!smartMode&&ps.length>1&&Math.max(...sizes)/Math.min(...sizes)>=3)parts.push('商品大小差很多，建議按「智慧擺品」依實際大小排列。');
   el.textContent=parts.join(' ');
 }
+function updateMemoryStatus(){
+  const el=document.getElementById('smartMemoryCount');if(!el)return;
+  el.textContent=String(Object.keys(smartMemory.names||{}).length);
+}
+document.getElementById('smartMemoryExport')?.addEventListener('click',()=>{
+  downloadBlob(new Blob([JSON.stringify({type:'freely-category-memory',version:1,...smartMemory},null,2)],{type:'application/json'}),'商品分類記憶.json');
+});
+document.getElementById('smartMemoryImportBtn')?.addEventListener('click',()=>document.getElementById('smartMemoryImport')?.click());
+document.getElementById('smartMemoryImport')?.addEventListener('change',async e=>{
+  const file=e.target.files[0];e.target.value='';if(!file)return;
+  try{
+    const data=JSON.parse(await file.text());
+    if(!data||typeof data!=='object'||(!data.names&&!data.tokens))throw new Error('不是商品分類記憶檔');
+    let added=0;
+    for(const kind of ['names','tokens'])for(const [k,v] of Object.entries(data[kind]||{})){
+      if(typeof k==='string'&&k.length<=80&&PRODUCT_SIZE_INDEX.has(v)){smartMemory[kind][k]=v;added++;}
+    }
+    saveSmartMemory();alert('已匯入 '+added+' 筆分類記憶（同名的會以匯入的為準）。');
+  }catch(err){alert('匯入失敗：'+err.message);}
+});
+document.getElementById('smartMemoryClear')?.addEventListener('click',()=>{
+  const n=Object.keys(smartMemory.names).length;
+  if(!n){alert('目前沒有分類記憶。');return;}
+  if(!confirm('要清除這台電腦上的 '+n+' 筆商品分類記憶嗎？清除後無法復原（已匯出的檔案不受影響）。'))return;
+  smartMemory={names:{},tokens:{}};saveSmartMemory();
+});
+
 let smartVariant=0;
 function applySmartLayout(variant=0){
   const els=getProductElements();if(!els.length)return;
   const plan=smartLayoutPlan(els.map(el=>({
-    id:el.dataset.id,sReal:productRealSize(el.dataset.category),
+    id:el.dataset.id,sReal:productSizeOf(readProductClass(el)),
     aspect:parseFloat(el.dataset.ratio)||1,featured:el.dataset.featured==='1'
   })),{sz:getSafeZone(),R:ratioValue(selectedCanvasRatio),variant,occlusion:document.getElementById('smartOcclusion')?.value||'low'});
   if(!plan)return;
@@ -2116,13 +2420,14 @@ function applySmartLayout(variant=0){
   plan.order.forEach(id=>stage.appendChild(byId.get(id)));
   byId.get(plan.order[plan.order.length-1]).classList.add('hero');
   if(plan.order.length>1)byId.get(plan.order[0]).classList.add('rearmost');
-  currentLayoutMode='smart';smartVariant=variant;
+  currentLayoutMode='smart';smartVariant=variant;smartLayoutDirty=false;
   posesStraightened=true;updatePoseToggleBtn();
   saveUserPositions();leftChanged();
 }
 document.getElementById('smartLayoutBtn')?.addEventListener('click',()=>applySmartLayout(0));
 document.getElementById('smartShuffleBtn')?.addEventListener('click',()=>applySmartLayout(currentLayoutMode==='smart'?smartVariant+1:0));
 document.getElementById('smartOcclusion')?.addEventListener('change',()=>{if(currentLayoutMode==='smart')applySmartLayout(smartVariant);});
+updateMemoryStatus();
 
 function refreshRefs(){
   [...document.querySelectorAll('.product[data-id]')].forEach((p,i)=>{
@@ -2141,6 +2446,7 @@ function refreshList(){
     const row=document.createElement('div');row.className='productItem';
     const isHero = p.classList.contains('hero');
     const isRear = p.classList.contains('rearmost');
+    const rec = readProductClass(p), specOpen = smartSpecOpen.has(p.dataset.id);
     row.innerHTML=`
       <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.dataset.ref || ('REF-'+String(i+1).padStart(2,'0'))} · ${p.dataset.name}</span>
       <button class="miniBtn${isHero?' active-front':''}" data-hero="${p.dataset.id}">最前面</button>
@@ -2148,18 +2454,35 @@ function refreshList(){
       <button class="remove" data-id="${p.dataset.id}">移除</button>
       <div class="productMeta">
         <select data-cat="${p.dataset.id}" class="${p.dataset.category?'':'unknown'}" aria-label="商品類別">${productCategoryOptions(p.dataset.category||'')}</select>
-        <span class="tierBadge" title="智慧擺品用的大小等級">${productSizeTier(p.dataset.category)}</span>
+        <span class="tierBadge" title="智慧擺品用的大小等級">${productTierLabel(rec)}</span>
         <button class="miniBtn featBtn${p.dataset.featured==='1'?' active-feat':''}" data-feat="${p.dataset.id}" title="主打商品放前排中間、稍微放大（不會超過比它大的商品）">★ 主打</button>
+        <button class="miniBtn specBtn${specOpen?' on':''}" data-spec-toggle="${p.dataset.id}" title="貼上商品名稱或規格，讓大小更準">✎</button>
+        <div class="productReason${rec.category?'':' warn'}">${smartEscape(productClassReason(rec))}</div>
+        ${specOpen?`<input class="specInput" data-spec="${p.dataset.id}" value="${smartEscape(rec.info)}" placeholder="貼上商品名稱或規格，例：500公升、55吋、30ml、70x65x170cm">`:''}
       </div>
     `;
     productList.appendChild(row);
   });
 
-  // 商品類別（智慧擺品用）
+  // 商品類別（智慧擺品用）：手動選的會記住；選「自動判斷」改回自動
   productList.querySelectorAll('[data-cat]').forEach(sel=>sel.onchange=()=>{
-    const el=document.querySelector(`.product[data-id="${sel.dataset.cat}"]`);
-    if(el)el.dataset.category=sel.value;
+    const el=document.querySelector(`.product[data-id="${sel.dataset.cat}"]`);if(!el)return;
+    const info=el.dataset.info||el.dataset.name||'';
+    writeProductClass(el,smartRecord(info,sel.value||null));
+    if(sel.value)rememberProductClass(info,sel.value);
+    smartLayoutDirty=true;refreshList();
+  });
+  productList.querySelectorAll('[data-spec-toggle]').forEach(btn=>btn.onclick=()=>{
+    const id=btn.dataset.specToggle;
+    if(smartSpecOpen.has(id))smartSpecOpen.delete(id);else smartSpecOpen.add(id);
     refreshList();
+    productList.querySelector(`[data-spec="${id}"]`)?.focus();
+  });
+  productList.querySelectorAll('[data-spec]').forEach(inp=>inp.onchange=()=>{
+    const el=document.querySelector(`.product[data-id="${inp.dataset.spec}"]`);if(!el)return;
+    const manual=el.dataset.catSource==='manual'?el.dataset.category:null;
+    writeProductClass(el,smartRecord(inp.value.trim(),manual));
+    smartLayoutDirty=true;refreshList();
   });
   // ★ 主打：同時只能有一個
   productList.querySelectorAll('[data-feat]').forEach(btn=>btn.onclick=()=>{
@@ -3258,7 +3581,7 @@ function getLayoutState(){
   refreshRefs();saveUserPositions();
   const products=getProductElements().map(p=>({
     id:p.dataset.id,ref:p.dataset.ref,name:p.dataset.name,filename:p.dataset.filename,ratio:p.dataset.ratio,
-    category:p.dataset.category||'',featured:p.dataset.featured==='1',
+    category:p.dataset.category||'',featured:p.dataset.featured==='1',classInfo:readProductClass(p),
     hero:p.classList.contains('hero'),rearmost:p.classList.contains('rearmost'),
     rotation:parseFloat(p.dataset.rotation)||0,defaultRotation:parseFloat(p.dataset.defaultRotation)||0,
     style:{left:p.style.left,top:p.style.top,width:p.style.width,height:p.style.height},imgSrc:p.querySelector('img')?.src||''
@@ -3317,7 +3640,15 @@ async function restoreLayoutState(data){
     box.dataset.id='p'+idx;box.dataset.name=item.name||'Product '+(idx+1);box.dataset.filename=item.filename||box.dataset.name;
     box.dataset.ratio=Math.max(.001,parseFloat(item.ratio)||1);box.dataset.ref='REF-'+String(idx+1).padStart(2,'0');
     // Older state files have no category: fall back to guessing from the file name.
-    box.dataset.category=PRODUCT_SIZE_INDEX.has(item.category)?item.category:guessProductCategory(item.filename||item.name);
+    // Older state files have no class record: classify again from the file name.
+    const ci=item.classInfo&&typeof item.classInfo==='object'?item.classInfo:null;
+    if(ci&&(!ci.category||PRODUCT_SIZE_INDEX.has(ci.category))){
+      const size=Number(ci.sizeCm);
+      writeProductClass(box,{info:String(ci.info||''),category:ci.category||'',source:String(ci.source||'none'),detail:String(ci.detail||''),
+        sizeCm:Number.isFinite(size)&&size>0&&size<1000?size:null,sizeDetail:String(ci.sizeDetail||'')});
+    }else if(PRODUCT_SIZE_INDEX.has(item.category)){
+      writeProductClass(box,{...smartRecord(smartInfoFromFileName(item.filename||item.name),item.category),source:'manual'});
+    }else writeProductClass(box,smartRecord(smartInfoFromFileName(item.filename||item.name)));
     if(item.featured===true)box.dataset.featured='1';
     for(const k of ['left','top','width','height'])box.style[k]=parseFloat(item.style[k])+'%';
     setProductRotation(box,Number(item.rotation)||0);box.dataset.defaultRotation=Number(item.defaultRotation)||0;
@@ -3654,7 +3985,8 @@ setTimeout(()=>{
     <div class="uploadModalBody">
       <div class="stepTabs">
         <button class="stepTab on" id="stepTab1">① 選取圖片</button>
-        <button class="stepTab" id="stepTab2">② 確認大小比例</button>
+        <button class="stepTab" id="stepTabCat">② 商品類別</button>
+        <button class="stepTab" id="stepTab2">③ 手動排順序（選用）</button>
       </div>
       <div id="stepContent1">
         <div id="modalDropZone" class="uploadDropZone" style="margin-bottom:14px">
@@ -3666,6 +3998,18 @@ setTimeout(()=>{
         <div id="modalPreviewGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:8px"></div>
         <div id="modalNoFiles" style="text-align:center;color:#9aa3b2;padding:8px;font-size:12px">尚未選取圖片</div>
         <div id="modalLimitWarn" style="display:none;text-align:center;color:#ffd166;font-size:12px;padding:6px 0">最多只能上傳 3 張，已自動忽略多餘的圖片</div>
+      </div>
+      <div id="stepContentCat" style="display:none">
+        <div class="catIntro">已依檔名、型號和規格自動判斷，<b>不用每件都選</b>；沒有類別的會先當中型，之後也能在左側商品清單修改。
+          判斷錯了點一下正確的分類就好，工具會記住，下次自動套用。</div>
+        <div id="catCards"></div>
+        <details class="catPaste">
+          <summary>📋 一次貼上多筆商品名稱（可從蝦皮 Excel 整列複製）</summary>
+          <textarea id="catPasteArea" rows="4" placeholder="一行一件，順序跟上面相同。例如：&#10;Panasonic 500公升 雙門變頻冰箱 NR-B501&#10;Dyson Supersonic 吹風機&#10;SK-II 青春露 230ml"></textarea>
+          <button type="button" class="secondary" id="catPasteApply">套用貼上的名稱</button>
+          <span id="catPasteNote" class="catPasteNote"></span>
+        </details>
+        <div id="catSummary" class="catSummary" role="status"></div>
       </div>
       <div id="stepContent2" style="display:none">
         <div style="font-size:12px;color:#8dd3ff;background:rgba(141,211,255,.08);border:1px solid rgba(141,211,255,.2);border-radius:10px;padding:8px 12px;margin-bottom:14px;line-height:1.7">
@@ -3698,9 +4042,13 @@ setTimeout(()=>{
   const noFiles     = document.getElementById('modalNoFiles');
   const limitWarn   = document.getElementById('modalLimitWarn');
   const stepTab1    = document.getElementById('stepTab1');
+  const stepTabCat  = document.getElementById('stepTabCat');
   const stepTab2    = document.getElementById('stepTab2');
   const stepContent1= document.getElementById('stepContent1');
+  const stepContentCat=document.getElementById('stepContentCat');
   const stepContent2= document.getElementById('stepContent2');
+  const catCardsEl  = document.getElementById('catCards');
+  const catSummary  = document.getElementById('catSummary');
   const modalNext   = document.getElementById('modalNext');
   const modalBack   = document.getElementById('modalBack');
   const modalSkip   = document.getElementById('modalSkip');
@@ -3717,13 +4065,17 @@ setTimeout(()=>{
     document.querySelectorAll('.product[data-id]').forEach(p => {
       const img = p.querySelector('img');
       if(!img || !img.src) return;
+      const rec = readProductClass(p);
+      if(!rec.info) rec.info = p.dataset.name || '';
       existing.push({
         src:  img.src,
         name: p.dataset.name || p.dataset.filename || 'product',
         file: null,
         fromCanvas: true,
         canvasId: p.dataset.id,
-        isHero: p.classList.contains('hero')
+        isHero: p.classList.contains('hero'),
+        rec,
+        featured: p.dataset.featured === '1'
       });
     });
     return existing;
@@ -3746,8 +4098,13 @@ setTimeout(()=>{
   function closeModal(){ modal.classList.remove('show'); }
 
   openBtn.addEventListener('click', () => {
+    // Start from what is on the canvas now (including categories edited in the product list, and
+    // without products removed since the last upload), the same way openModal() does.
+    stagedFiles = loadExistingProducts().slice(0, MAX_UPLOAD);
+    const hi = stagedFiles.findIndex(f => f.isHero);
+    heroIndex = hi >= 0 ? hi : -1;
     // Skip the first step (preview grid) — go directly to file picker,
-    // and jump to step 2 (size/ratio confirmation) after selection.
+    // and jump to the category step after selection.
     window._skipToStep2 = true;
     fileInput.click();
   });
@@ -3770,10 +4127,11 @@ setTimeout(()=>{
     window._skipToStep2 = false;
     await handleFiles(files);
     if(skipToStep2 && stagedFiles.length > 0){
-      // Skip step 1; go straight to modal at step 2 (size/ratio confirmation)
-      rankOrder = null; currentStep = 2;
+      // Skip step 1; go straight to the category step (auto-detected, every pick optional)
+      rankOrder = null;
       modal.classList.add('show');
-      initRankOrder(); renderRankRow(); showStep(2);
+      if(stagedFiles.length > MAX_APPLY){ renderPreviewGrid(); updateLimitWarn(); showStep(1); }
+      else showStep('cat');
     }
   });
 
@@ -3785,7 +4143,8 @@ setTimeout(()=>{
 
     // Read all files in parallel for speed
     const results = await Promise.all(toAdd.map(f =>
-      readFileSrc(f).then(src => ({ file:f, src, name: fileBaseName(f.name)||f.name, fromCanvas: false }))
+      readFileSrc(f).then(src => ({ file:f, src, name: fileBaseName(f.name)||f.name, fromCanvas: false,
+        rec: smartRecord(smartInfoFromFileName(f.name)) }))
     ));
     results.forEach(r => stagedFiles.push(r));
     updateLimitWarn();
@@ -4012,43 +4371,146 @@ setTimeout(()=>{
     });
   }
 
+  // Steps: 1 = 選取圖片, 'cat' = 商品類別 (every pick optional), 2 = 手動排順序 (optional, old triangle layout)
   function showStep(n){
     currentStep = n;
-    stepContent1.style.display = n===1 ? '' : 'none';
-    stepContent2.style.display = n===2 ? '' : 'none';
+    stepContent1.style.display   = n===1 ? '' : 'none';
+    stepContentCat.style.display = n==='cat' ? '' : 'none';
+    stepContent2.style.display   = n===2 ? '' : 'none';
     stepTab1.classList.toggle('on', n===1);
+    stepTabCat.classList.toggle('on', n==='cat');
     stepTab2.classList.toggle('on', n===2);
-    modalBack.style.display = n===2 ? '' : 'none';
-    modalNext.textContent   = n===1 ? '下一步 →' : '確認並套用構圖';
-    modalSkip.textContent   = n===1 ? '跳過，直接套用' : '跳過比例，直接套用';
+    modalBack.style.display = n===1 ? 'none' : '';
+    if(n===1){ modalSkip.textContent='跳過，直接套用'; modalNext.textContent='下一步 →'; }
+    else if(n==='cat'){ modalSkip.textContent='改用手動排順序 →'; modalNext.textContent='✦ 依大小自動擺好'; }
+    else { modalSkip.textContent='跳過比例，直接套用'; modalNext.textContent='確認並套用構圖'; }
     modalNext.style.opacity = '1';
     modalNext.style.pointerEvents = '';
     if(n===1) updateLimitWarn();
+    if(n==='cat') renderCatCards();
     if(n===2){ initRankOrder(); renderRankRow(); }
   }
+  const stagedReady = () => stagedFiles.length && stagedFiles.length <= MAX_APPLY;
 
   stepTab1.addEventListener('click', ()=>{ if(currentStep!==1) showStep(1); });
-  stepTab2.addEventListener('click', ()=>{
-    if(currentStep!==2 && stagedFiles.length && stagedFiles.length <= MAX_APPLY) showStep(2);
-  });
+  stepTabCat.addEventListener('click', ()=>{ if(currentStep!=='cat' && stagedReady()) showStep('cat'); });
+  stepTab2.addEventListener('click', ()=>{ if(currentStep!==2 && stagedReady()) showStep(2); });
 
   modalNext.addEventListener('click', ()=>{
     if(currentStep===1){
       if(!stagedFiles.length) return;
       if(stagedFiles.length > MAX_APPLY){ updateLimitWarn(); return; }
-      showStep(2);
+      showStep('cat');
+    } else if(currentStep==='cat'){
+      applyWithOrder(stagedFiles.slice(0, MAX_APPLY), true, {smart:true}); closeModal();
     } else {
       applyWithOrder(rankOrder.map(i=> stagedFiles[i])); closeModal();
     }
   });
-  modalBack.addEventListener('click', ()=> showStep(1));
+  modalBack.addEventListener('click', ()=> showStep(currentStep===2 ? 'cat' : 1));
   modalSkip.addEventListener('click', ()=>{
     if(!stagedFiles.length){ closeModal(); return; }
+    if(currentStep==='cat'){ showStep(2); return; }
     const toApply = stagedFiles.slice(0, MAX_APPLY);
-    applyWithOrder(toApply, true); closeModal();
+    // Skipping from step 1 means "use the automatic categories"; from step 3 it keeps the old default layout.
+    applyWithOrder(toApply, true, {smart: currentStep===1}); closeModal();
   });
 
-  async function applyWithOrder(orderedFiles, skipRatio){
+  // ---- Step 2: 商品類別 ----
+  const itemInfo = item => item.rec ? item.rec.info : smartInfoFromFileName(item.name);
+  function ensureRec(item){ if(!item.rec) item.rec = smartRecord(smartInfoFromFileName(item.name)); return item.rec; }
+  function setItemClass(item, category, pickedGroup=null){
+    const info = itemInfo(item);
+    item.rec = smartRecord(info, category || null);
+    item.pickedGroup = pickedGroup;
+    if(category) rememberProductClass(info, category);
+  }
+  function subChipsHtml(group, current, onlyGroupOn){
+    const list = PRODUCT_SIZE_DB.filter(e => group.db.includes(e[1]));
+    return list.map(e => `<button type="button" data-c="${e[0]}" class="${e[0]===current?'on':''}">${e[2]}</button>`).join('')
+      + `<button type="button" data-c="${group.fallback}" data-gk="${group.key}" class="catOnlyGroup${onlyGroupOn?' on':''}">只知道是${group.label}</button>`;
+  }
+  function renderCatPick(card, item){
+    const rec = ensureRec(item), isTier = !!rec.category && rec.category.startsWith('tier_');
+    // A bare size class only belongs to a group when the user tapped that group.
+    const grp = isTier ? (SMART_UI_GROUPS.find(g => g.key===item.pickedGroup && g.fallback===rec.category) || null) : smartGroupOf(rec.category);
+    // Item lists stay folded until the user taps a group (the detected group is still highlighted).
+    // openGroup: null / 'none' = folded, otherwise the group whose items are shown.
+    const open = item.openGroup ?? null;
+    const name = !rec.category ? '未分類' : isTier ? (grp ? grp.label+'（未細分）' : '類別未指定') : productClassName(rec);
+    card.classList.toggle('unknown', !rec.category);
+    card.querySelector('.catHead').innerHTML =
+      `<b class="catName">${smartEscape(name)}</b>`
+      + `<span class="catTier">${rec.category ? '大小：'+productTierLabel(rec) : '先當中型'}</span>`
+      + (rec.source!=='none' ? `<span class="catWhy">${smartEscape(productClassReason(rec))}</span>` : '')
+      + (rec.source==='manual' ? '<button type="button" class="catAuto">↺ 改回自動判斷</button>' : '');
+    const openGroup = SMART_UI_GROUPS.find(g => g.key===open);
+    card.querySelector('.catPick').innerHTML =
+      `<div class="catGroups">${SMART_UI_GROUPS.map(g => `<button type="button" data-g="${g.key}" class="${grp&&grp.key===g.key?'on':''}${open===g.key?' open':''}">${g.label}</button>`).join('')}</div>`
+      + (openGroup ? `<div class="catSubs">${subChipsHtml(openGroup, rec.category, isTier && grp && grp.key===openGroup.key)}</div>` : '');
+  }
+  function updateCatSummary(){
+    const n = stagedFiles.length, unknown = stagedFiles.filter(it => !ensureRec(it).category).length;
+    catSummary.className = 'catSummary' + (unknown ? ' warn' : ' ok');
+    catSummary.textContent = unknown
+      ? `${unknown} 件還沒有類別，會先當中型擺放，之後可在左側商品清單修改。不選也可以直接按「✦ 依大小自動擺好」。`
+      : `✓ ${n} 件都有類別了，按「✦ 依大小自動擺好」就會依實際大小排好。`;
+  }
+  function renderCatCards(){
+    catCardsEl.innerHTML = '';
+    stagedFiles.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'catCard';
+      card.innerHTML = `<img src="${item.src}" alt="">
+        <div class="catBody">
+          <div class="catHead"></div>
+          <input class="catInfo" value="${smartEscape(itemInfo(item))}" placeholder="商品名稱或規格（選填），例：500公升、55吋、30ml、70x65x170cm" aria-label="商品名稱或規格">
+          <div class="catPick"></div>
+        </div>`;
+      renderCatPick(card, item);
+      let t = null;
+      card.querySelector('.catInfo').addEventListener('input', e => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+          const manual = item.rec && item.rec.source==='manual' ? item.rec.category : null;
+          item.rec = smartRecord(e.target.value.trim(), manual);
+          renderCatPick(card, item); updateCatSummary();
+        }, 250);
+      });
+      card.addEventListener('click', e => {
+        const b = e.target.closest('button'); if(!b) return;
+        if(b.classList.contains('catAuto')){ item.rec = smartRecord(itemInfo(item)); item.openGroup = null; item.pickedGroup = null; }
+        else if(b.dataset.g){
+          // Tapping the current group folds/unfolds its items; tapping another group picks that group.
+          const g = SMART_UI_GROUPS.find(x => x.key===b.dataset.g);
+          const cat = item.rec.category, cur = cat && cat.startsWith('tier_') ? (item.pickedGroup===g.key ? g : null) : smartGroupOf(cat);
+          if(cur && cur.key===g.key){ item.openGroup = item.openGroup===g.key ? 'none' : g.key; }
+          else { setItemClass(item, g.fallback, g.key); item.openGroup = g.key; }
+        }
+        else if(b.dataset.gk){ setItemClass(item, b.dataset.c, b.dataset.gk); item.openGroup = b.dataset.gk; }
+        else if(b.dataset.c){ setItemClass(item, b.dataset.c); item.openGroup = smartGroupOf(b.dataset.c)?.key || null; }
+        else return;
+        renderCatPick(card, item); updateCatSummary();
+      });
+      catCardsEl.appendChild(card);
+    });
+    updateCatSummary();
+  }
+  document.getElementById('catPasteApply').addEventListener('click', () => {
+    let lines = document.getElementById('catPasteArea').value.split(/\r?\n/).map(l => l.replace(/\t+/g, ' ').trim()).filter(Boolean);
+    if(lines.length && /商品名稱|product\s*name/i.test(lines[0])) lines = lines.slice(1);   // header row copied from Excel
+    const note = document.getElementById('catPasteNote');
+    if(!lines.length){ note.textContent = '沒有可套用的內容'; return; }
+    const n = Math.min(lines.length, stagedFiles.length);
+    for(let i = 0; i < n; i++){
+      const item = stagedFiles[i], manual = item.rec && item.rec.source==='manual' ? item.rec.category : null;
+      item.rec = smartRecord(lines[i], manual);
+    }
+    note.textContent = lines.length===stagedFiles.length ? `已套用 ${n} 行` : `貼上 ${lines.length} 行，已依序套用到前 ${n} 件`;
+    renderCatCards();
+  });
+
+  async function applyWithOrder(orderedFiles, skipRatio, opts={}){
     if(!orderedFiles.length) return;
     // Clear existing canvas products first
     document.querySelectorAll('.product[data-id]').forEach(p=> p.remove());
@@ -4062,10 +4524,22 @@ setTimeout(()=>{
         const blob = await (await fetch(item.src)).blob();
         file = new File([blob], item.name+'.png', {type:'image/png'});
       }
+      const before = getProductElements().length;
       await addProductFromFile(file);
-      const els = [...document.querySelectorAll('.product[data-id]')];
-      added.push(els[els.length-1]);
+      const els = getProductElements();
+      if(els.length === before) continue;   // unreadable image: nothing was added
+      const el = els[els.length-1];
+      // Carry over the category chosen (or confirmed) in the 商品類別 step, and ★ 主打 from the canvas.
+      if(item.rec) writeProductClass(el, item.rec);
+      if(item.featured) el.dataset.featured = '1';
+      added.push(el);
     }
+    if(!added.length){ refreshList(); return; }
+    if(opts.smart){
+      requestAnimationFrame(() => { applySmartLayout(0); });
+      return;
+    }
+    if(currentLayoutMode === 'smart') currentLayoutMode = 'triangle';
     document.querySelectorAll('.product[data-id]').forEach(p=> p.classList.remove('hero'));
     if(added[0]) added[0].classList.add('hero');
     // Auto-assign rearmost to last product if more than 1
