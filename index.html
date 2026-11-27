@@ -557,15 +557,58 @@ button:disabled{cursor:not-allowed;background:#2a2f3d!important;color:#6b7383!im
 .optionCard.active .thumb{
   box-shadow:0 0 0 2px rgba(141,211,255,.25);
 }
-/* 背景風格 category filter */
-.sceneFilter{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
-.sceneFilterBtn{width:auto;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:800;background:#1a1f2b;border:1px solid #333b4d;color:#c9d2e0}
-.sceneFilterBtn span{margin-left:5px;font-size:10px;color:#7f8aa0;font-weight:700}
-.sceneFilterBtn.on{background:#8dd3ff;border-color:#8dd3ff;color:#06101a}
-.sceneFilterBtn.on span{color:#06101a;opacity:.7}
-.scenePicked{font-size:11px;color:#9aa3b2;margin:-2px 0 8px}
-.scenePicked:empty{display:none}
-.scenePicked b{color:#8dd3ff}
+/* 背景風格: current style card, quick picks, 配色 and 展台 rows */
+.styleCurrent{display:grid;grid-template-columns:44% 1fr;gap:10px;align-items:stretch;padding:10px;border-radius:14px;border:1px solid var(--accent);background:#11141c;box-shadow:0 0 0 2px rgba(141,211,255,.15)}
+.styleCurrent .thumb{height:auto;min-height:72px;margin:0;cursor:pointer}
+.styleCurInfo{display:flex;flex-direction:column;gap:3px;min-width:0}
+.styleCurName{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:14px;font-weight:900;color:#f5f7fb}
+.styleCurDesc{font-size:11px;color:#9aa3b2;line-height:1.5}
+.styleOpenBtn{margin-top:auto;padding:7px 8px;font-size:12px}
+.styleFavBtn{width:auto;flex:0 0 auto;padding:0 4px;background:none;border:0;color:#7f8aa0;font-size:17px;line-height:1;cursor:pointer}
+.styleFavBtn.on{color:#ffd166}
+.styleQuickLabel{font-size:11px;color:#9aa3b2;margin:10px 0 6px}
+.styleQuickRow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.styleQuickItem{display:grid;gap:3px;padding:4px;background:#11141c;border:1px solid var(--line);border-radius:10px;color:#c9d2e0;font-size:10.5px;font-weight:700;text-align:left}
+.styleQuickItem .thumb{height:34px;margin:0;border-radius:7px}
+.styleQuickItem span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.styleQuickItem:hover{border-color:#3b4458}
+.styleOptLabel{font-size:12px;color:#c9d2e0;font-weight:700;margin:12px 0 6px}
+.styleOptLabel span{display:block;font-size:10.5px;color:#7f8aa0;font-weight:400;margin-top:2px}
+.colorRow,.podiumRow,.styleLibColors{display:flex;flex-wrap:wrap;gap:5px}
+.colorDot{width:auto;display:inline-flex;align-items:center;gap:5px;padding:4px 8px 4px 5px;border-radius:999px;font-size:11px;font-weight:700;background:#1a1f2b;border:1px solid #333b4d;color:#c9d2e0}
+.colorDot i{width:13px;height:13px;border-radius:50%;background:var(--dot);border:1px solid rgba(255,255,255,.25)}
+.colorDot.auto{padding:4px 9px}
+.colorDot.on{border-color:#8dd3ff;background:rgba(141,211,255,.15);color:#fff;box-shadow:0 0 0 1px #8dd3ff}
+.podiumBtn{width:auto;padding:5px 10px;border-radius:999px;font-size:11.5px;font-weight:700;background:#1a1f2b;border:1px solid #333b4d;color:#c9d2e0}
+.podiumBtn.on{background:#8dd3ff;border-color:#8dd3ff;color:#06101a}
+/* 背景風格庫 window */
+.styleLib{position:fixed;inset:0;z-index:30000;background:rgba(6,10,16,.82);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:24px}
+.styleLib[hidden]{display:none}
+.styleLibBox{width:min(96vw,1080px);max-height:92vh;display:flex;flex-direction:column;gap:10px;background:#0f1117;border:1px solid rgba(255,255,255,.14);border-radius:22px;box-shadow:0 34px 90px rgba(0,0,0,.55);padding:18px 20px}
+.styleLibHead{display:flex;align-items:center;gap:12px}
+.styleLibHead h3{margin:0;font-size:17px;font-weight:900;color:#f5f7fb;white-space:nowrap}
+.styleLibHead input{flex:1;padding:9px 12px;font-size:13px}
+.styleLibClose{width:40px;height:40px;flex:0 0 auto;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-size:22px;padding:0}
+.styleLibTabs{display:flex;flex-wrap:wrap;gap:6px}
+.styleLibTab{width:auto;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800;background:#1a1f2b;border:1px solid #333b4d;color:#c9d2e0}
+.styleLibTab span{margin-left:5px;font-size:10px;color:#7f8aa0}
+.styleLibTab.on{background:#8dd3ff;border-color:#8dd3ff;color:#06101a}
+.styleLibTab.on span{color:#06101a;opacity:.7}
+.styleLibColorsLabel{font-size:11px;color:#7f8aa0;align-self:center;margin-right:2px}
+.styleLibGrid{overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;padding:2px 4px 4px 2px;align-content:start}
+.styleCard{position:relative;padding:8px;border-radius:14px;border:1px solid var(--line);background:#11141c;cursor:pointer;transition:.15s}
+.styleCard:hover{border-color:#3b4458;transform:translateY(-1px)}
+.styleCard.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(141,211,255,.25)}
+.styleCard .thumb{height:auto;aspect-ratio:2/1;margin:0 0 7px}
+.styleCard .styleFavBtn{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:rgba(15,17,23,.72);font-size:15px}
+.styleCardName{font-size:13px;font-weight:900;color:#f5f7fb}
+.styleCardDesc{font-size:11px;color:#9aa3b2;margin-top:2px}
+.styleCardMeta{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:5px;font-size:10.5px;color:#7f8aa0}
+.styleCardDots{display:flex;gap:3px}
+.styleCardDots i{width:9px;height:9px;border-radius:50%;border:1px solid rgba(255,255,255,.25)}
+.styleLibEmpty{grid-column:1/-1;padding:30px;text-align:center;color:#9aa3b2;font-size:13px}
+.styleLibEmpty button{width:auto;margin-left:8px;padding:6px 12px;font-size:12px}
+@media(max-width:700px){.styleLibHead{flex-wrap:wrap}.styleLibHead input{order:3;flex-basis:100%}.styleLibGrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
 .thumb.sceneImg.drawn{background-size:cover}
 /* Illustrated thumbnails (背景元素選項) drawn as inline SVG */
 .thumb.illus:before,.thumb.illus:after{display:none}
@@ -1384,9 +1427,24 @@ html,body{height:100%;overflow:hidden}
 </div>
 
 <h2>背景風格</h2><p style="font-size:12px;color:#9aa3b2">只改背景顏色、材質與氛圍。商品位置、大小、角度以中間編輯器為準。</p>
-<div class="sceneFilter" id="sceneFilter" role="tablist" aria-label="背景風格分類"></div>
-<p class="scenePicked" id="scenePicked" role="status"></p>
-<div class="optionGrid" id="sceneGrid"></div>
+<div class="styleCurrent" id="styleCurrent"></div>
+<div id="styleQuick"></div>
+<div class="styleOptLabel">配色<span>任何風格都能換色；「原色」用風格本身的顏色</span></div>
+<div class="colorRow" id="sceneColorRow" role="radiogroup" aria-label="配色"></div>
+<div class="styleOptLabel">展台<span>商品站在展台上；「依風格」用該風格的預設</span></div>
+<div class="podiumRow" id="podiumRow" role="radiogroup" aria-label="展台"></div>
+<div class="styleLib" id="styleLib" hidden>
+  <div class="styleLibBox" role="dialog" aria-modal="true" aria-label="背景風格庫">
+    <div class="styleLibHead">
+      <h3>背景風格庫</h3>
+      <input type="search" id="styleSearch" placeholder="搜尋：紅、展台、海邊、聖誕、新年、氣球…" aria-label="搜尋風格">
+      <button type="button" class="styleLibClose" id="styleLibClose" aria-label="關閉">×</button>
+    </div>
+    <div class="styleLibTabs" id="styleLibTabs" role="tablist"></div>
+    <div class="styleLibColors" id="styleLibColors"></div>
+    <div class="styleLibGrid" id="styleLibGrid"></div>
+  </div>
+</div>
 <textarea id="customScene" class="hidden" placeholder="請輸入自訂場景，中文也可以。建議只寫顏色、材質、光影、氛圍，不要寫留白/遠景/重構圖。例如：夏日清爽藍白色棚拍，有水波光影"></textarea>
 
 <h2>背景元素選項</h2>
@@ -1529,8 +1587,11 @@ window.addEventListener('hashchange', () => {
 });
 
 // Scene, density and lights describe background only; the layout always has priority.
-// [key, 名稱, background prompt, 短說明, badge]. Saved layouts and the phone wizard refer to scenes by key,
-// so the order can change freely; 試試手氣 and 自訂 stay last.
+// ===================== 背景風格庫 =====================
+// 新增風格：1) 在 scenes 加一列；2) 在 STYLE_META 補分類、色系、預設展台與搜尋關鍵字；
+// 3) 把 480×240 的縮圖放到 場景縮圖/<名稱>.jpg，並把 key 加進 SCENE_THUMB_PHOTOS。
+// 同一種構圖只是顏色不同時，不要新增風格：用「配色」切換；有沒有展台用「展台」選項。
+// [key, 名稱, background prompt, 短說明, badge]. Saved layouts and the phone wizard refer to styles by key.
 const scenes=[
  // 棚拍質感
  ['white','未來感白色棚','Pure white seamless backdrop; glossy white background surface; cool diffused ambient light.','冷白・光滑材質','僅控制背景'],
@@ -1540,40 +1601,105 @@ const scenes=[
  ['gradient','漸層色棚','Smooth pastel gradient backdrop; matte background surface; soft diffused illumination.','柔和漸層・霧面','僅控制背景'],
  ['tech','科技生活棚','Slate grey and muted blue backdrop; brushed metal or matte desktop background texture; diffused cool background light.','冷灰藍・科技材質','僅控制背景'],
  ['dark','黑色精品棚','Deep black backdrop; dark marble background texture; restrained pools of warm background light.','深黑・低調光影','僅控制背景'],
- ['silk','奢華絲綢舞台','Luxurious stage of flowing satin drapery in royal blue (or deep red), a soft top spotlight pooling on the floor, fine sparkles and one gold ribbon accent. Premium, elegant mood.','寶藍絲綢・頂光金帶','僅控制背景'],
  ['sunlight','窗光葉影','Warm beige plaster wall and a low ledge bathed in diagonal window sunlight, with soft leaf shadows on the wall and a few green leaves at one edge. Natural, calm lifestyle mood.','米色牆面・斜光葉影','僅控制背景'],
+ // 展台舞台
+ ['silk','奢華絲綢舞台','Luxurious stage of flowing satin drapery — royal blue by default; deep red or emerald green also suit — with a soft top spotlight pooling on the floor, gentle light beams, fine gold sparkles and one gold ribbon accent. Premium, elegant mood.','絲綢布幔・頂光金帶','僅控制背景'],
+ ['party','大促派對舞台','Celebration stage for a big sale: soft curtains or a rounded arch backdrop, a warm spotlight on the floor, floating balloons, curled ribbons, confetti and sparkles, and a wrapped gift box at one side. Vivid orange-gold by default; pink, peach, turquoise, blue or red versions also suit.','氣球彩帶・布幔聚光','僅控制背景'],
+ ['neonpodium','光環展台','Futuristic launch stage in deep navy blue: soft arched backdrop shapes, a glowing neon light ring around the floor, light rising like mist, small twinkling star sparkles and a few curled gold ribbons. Modern, premium mood.','深藍霓虹・光環金帶','僅控制背景'],
+ ['glasspodium','清透展台','Clean, airy setting in fresh turquoise: soft light beams from above, frosted-glass acrylic surfaces, a subtle halftone-dot texture and a few floating gold coins as accents. Fresh rewards and cashback promotion mood.','壓克力光束・金幣','僅控制背景'],
+ ['speed','動感箭頭展台','Dynamic promotion setting: textured concrete or matte surfaces, bold chevron arrows pointing forward, light streaks and halftone dots. Electric blue by default; grey with yellow arrows also suits. Energetic flash-sale mood.','箭頭光速・水泥質感','僅控制背景'],
+ ['blackgold','黑金典禮','Black-and-gold gala stage: a curtain of soft vertical golden light behind, a glowing gold horizon line, sparkling gold particles and spotlight beams on a dark floor. Prestigious award-night mood.','黑金光幕・典禮感','僅控制背景'],
  // 節慶大促
  ['season','節慶氛圍棚','Burgundy, champagne and cream background palette; subtle festive textures. Decoration quantity is controlled separately.','節慶色調・裝飾量另選','僅控制背景'],
- ['party','大促派對舞台','Festive sale-event stage in vivid orange-gold or hot pink: a warm spotlight glow on a soft floor, floating gold confetti ribbons and sparkles, with a folded paper fan or a wrapped gift box as accents at the sides.','亮橘桃紅・彩帶聚光','僅控制背景'],
- ['redgold','紅金喜慶','Rich festive red background with a flowing wave of gold glitter, soft red satin drapes, a folded paper fan and a few gold coins as accents, warm glow and sparkles. Lucky, celebratory New Year and big-sale mood.','正紅金粉・摺扇金幣','僅控制背景'],
+ ['redgold','紅金喜慶','Rich festive red: a flowing wave of gold glitter or glowing gold light arcs, red satin drapes with warm curtain light, and accents such as a folded paper fan, gold coins, fireworks or swallows. Lucky, celebratory New Year and big-sale mood.','正紅金粉・摺扇金幣','僅控制背景'],
+ ['romance','粉紅浪漫','Romantic soft-pink setting: large 3D paper hearts standing in the background, gentle sparkles, curled silver ribbons and a small wrapped gift box at one side. Valentine\'s and gifting mood.','粉色愛心・禮物緞帶','僅控制背景'],
+ // 東方節日
  ['oriental','東方國風','Elegant oriental setting in deep teal, indigo or warm gold: subtle traditional patterns (seigaiha waves or interlocking coin circles), a round moon-gate arch behind, a smooth wooden floor, auspicious clouds and gold-leaf plum blossoms as accents.','青海波紋・圓拱金箔','僅控制背景'],
  ['moon','中秋月夜','Mid-Autumn night in warm golden tones: a large glowing full moon in the background, sprigs of yellow osmanthus blossoms at the edges and a pale marble tabletop.','金黃滿月・石材桌面','僅控制背景'],
+ ['lantern','新春燈籠夜','Lunar New Year night in deep navy blue: glowing red lanterns hanging at the top corners, colourful fireworks in the sky and gold ingots on a softly sparkling blue floor. Joyful festival-night mood.','紅燈籠・煙火元寶','僅控制背景'],
  // 季節場景
- ['beach','夏日海灘','Bright summer beach: clear blue sky with light clouds, turquoise sea and gentle waves, a smooth white-sand floor, a frangipani flower and a blurred monstera leaf at the edges, soft sun flare.','藍天白沙・熱帶植物','僅控制背景'],
+ ['beach','夏日海灘','Bright summer seaside: clear blue sky with light clouds, turquoise sea and gentle waves, a smooth white-sand floor or calm water surface, a frangipani flower, palm or monstera leaves and a few seashells at the edges, soft sun flare.','藍天白沙・熱帶植物','僅控制背景'],
+ ['seaterrace','海景花園陽台','Sunny seaside terrace: sparkling blue sea behind a white wooden railing, white daisy bushes at both sides, a smooth white tabletop in front and a few pink cosmos flowers. Fresh, relaxed summer mood.','白色欄杆・海景花叢','僅控制背景'],
  ['underwater','海底世界','Playful underwater scene: bright blue water with rippling light caustics, a pale sandy seabed floor, seaweed, small pebbles and rising bubbles at the sides.','水光波紋・白沙海草','僅控制背景'],
  ['autumn','秋日野餐','Autumn picnic: a checked picnic blanket on golden grass in warm late-afternoon sunlight, scattered maple leaves and a string of softly glowing fairy lights, maple branches along the top edge.','格紋野餐墊・楓葉串燈','僅控制背景'],
  ['winter','冬日雪景','Winter night in deep blue: a soft spotlight beam, gently falling snowflakes and bokeh, a smooth snowy floor. Calm, magical holiday mood.','深藍夜空・雪花聚光','僅控制背景'],
  // 插畫拼貼
  ['doodle','手繪塗鴉','Hand-drawn illustration style on textured paper: a flat bright colour with crayon texture, playful doodled stars, organic cut-out colour shapes and squiggly lines near the edges. Fun, youthful mood.','紙紋蠟筆・有機色塊','僅控制背景'],
+ ['storybook','童趣插畫','Cute storybook illustration on soft paper texture: rounded green hills with bushes and small flowers, fluffy clouds, a leafy branch at a top corner and a warm pale-yellow sky. Gentle, child-friendly mood.','繪本草地・雲朵花叢','僅控制背景'],
+ ['comic','普普漫畫','Pop-art comic style: a flat bright blue background, a big white cartoon cloud shape with halftone shading and bold outlines, motion lines and small sparkles. Playful, attention-grabbing mood.','漫畫雲朵・網點線條','僅控制背景'],
  ['collage','拼貼手帳','Trendy paper-collage style: torn paper pieces, grid paper, halftone dots and thin line graphics with pressed botanical sketches, in muted olive, grey or lime. Editorial, creative mood.','撕紙方格・壓花線條','僅控制背景'],
+ ['travel','旅遊地標','Paper-cut travel collage: a light sky-blue background with crumpled paper texture, pastel cut-out landmarks (Statue of Liberty, Leaning Tower of Pisa, Eiffel Tower) along the horizon, a curving blue running track and small sparkles. Adventurous travel mood.','紙雕地標・跑道','僅控制背景'],
  ['lucky','試試手氣','LUCKY_RANDOM_STYLE','隨機背景；再點一次換風格','商品排版不變'],
  ['custom','自訂場景','custom','填寫背景顏色、材質、氛圍','商品排版優先']
 ];
-// Category filter above the style cards. 試試手氣 and 自訂 show in every category.
-const SCENE_GROUPS=[
-  {key:'all',label:'全部'},
-  {key:'studio',label:'棚拍質感',scenes:['white','beige','clean','window','gradient','tech','dark','silk','sunlight']},
-  {key:'festive',label:'節慶大促',scenes:['season','party','redgold','oriental','moon']},
-  {key:'seasonal',label:'季節場景',scenes:['beach','underwater','autumn','winter']},
-  {key:'illus',label:'插畫拼貼',scenes:['doodle','collage']}
+const STYLE_GROUPS=[
+  {key:'studio',label:'棚拍質感'},{key:'stage',label:'展台舞台'},{key:'festive',label:'節慶大促'},
+  {key:'oriental',label:'東方節日'},{key:'seasonal',label:'季節場景'},{key:'illus',label:'插畫拼貼'}
 ];
-let sceneFilter='all';
-// Photo thumbnails in 場景縮圖/<名稱>.<ext>. The newer styles use small JPG crops (480×240) of the reference
-// banners. A style without a photo shows its drawn colour preview below, which also sits behind every photo
-// as a fallback in case the file is missing.
+// g: group · c: colours it comes in (for the colour filter) · p: default podium · t: extra search words
+const STYLE_META={
+  white:{g:'studio',c:['white'],t:'白 極簡 乾淨 未來 科技'},
+  beige:{g:'studio',c:['beige'],t:'米 奶茶 暖色 自然 亞麻'},
+  clean:{g:'studio',c:['white'],t:'白 電商 純白 去背'},
+  window:{g:'studio',c:['black','beige'],t:'精品 炭灰 石材 琥珀'},
+  gradient:{g:'studio',c:['pink','blue','purple'],t:'漸層 粉彩 馬卡龍'},
+  tech:{g:'studio',c:['blue','white'],t:'科技 3C 金屬 數位'},
+  dark:{g:'studio',c:['black'],t:'黑 精品 大理石 低調'},
+  sunlight:{g:'studio',c:['beige'],t:'陽光 窗光 葉影 生活 自然 居家'},
+  silk:{g:'stage',c:['blue','red','green'],t:'絲綢 布幔 舞台 奢華 頂光 窗簾'},
+  party:{g:'stage',c:['orange','pink','teal','blue','red'],p:'round',t:'派對 氣球 彩帶 禮物 禮盒 展台 大促 週年慶 布幔'},
+  neonpodium:{g:'stage',c:['blue'],p:'round',t:'光環 霓虹 科技 展台 發表 新品'},
+  glasspodium:{g:'stage',c:['teal'],p:'square',t:'壓克力 玻璃 金幣 回饋 現金 展台 清新'},
+  speed:{g:'stage',c:['blue','white','yellow'],p:'steps',t:'箭頭 動感 速度 限時 快閃 水泥 展台 階梯'},
+  blackgold:{g:'stage',c:['black','yellow'],p:'round',t:'黑金 典禮 頒獎 奢華 展台 金色'},
+  season:{g:'festive',c:['red','yellow'],t:'節慶 酒紅 香檳'},
+  redgold:{g:'festive',c:['red','yellow'],t:'紅金 新年 過年 春節 喜慶 金幣 摺扇 煙火 燕子 雙11 雙12'},
+  romance:{g:'festive',c:['pink'],t:'情人節 粉紅 愛心 浪漫 母親節 禮物 七夕'},
+  oriental:{g:'oriental',c:['teal','purple','yellow'],t:'國風 東方 中國風 祥雲 青海波 梅花 新年 古錢'},
+  moon:{g:'oriental',c:['yellow'],t:'中秋 月亮 桂花 月餅'},
+  lantern:{g:'oriental',c:['blue','red'],t:'燈籠 元宵 新年 春節 煙火 元寶 過年'},
+  beach:{g:'seasonal',c:['blue'],t:'夏天 夏日 海灘 海邊 沙灘 熱帶 貝殼 棕櫚'},
+  seaterrace:{g:'seasonal',c:['blue','white'],t:'夏天 海景 陽台 花園 海邊 雛菊'},
+  underwater:{g:'seasonal',c:['blue'],t:'海底 夏天 童趣 水族'},
+  autumn:{g:'seasonal',c:['orange','yellow'],t:'秋天 野餐 楓葉 串燈 戶外'},
+  winter:{g:'seasonal',c:['blue'],t:'冬天 雪 聖誕 耶誕 冬季 雪花'},
+  doodle:{g:'illus',c:['orange','yellow'],t:'手繪 塗鴉 蠟筆 童趣 色塊 星星'},
+  storybook:{g:'illus',c:['yellow','green'],t:'童趣 插畫 繪本 草地 兒童 母嬰 雲朵'},
+  comic:{g:'illus',c:['blue'],t:'漫畫 普普 對話框 雲朵 pop 網點'},
+  collage:{g:'illus',c:['green','white'],t:'拼貼 手帳 撕紙 文青 方格'},
+  travel:{g:'illus',c:['blue'],t:'旅遊 旅行 地標 出國 拼貼 跑道'},
+  lucky:{g:'',c:[],t:'隨機 手氣'},
+  custom:{g:'',c:[],t:'自訂 自己寫'}
+};
+// 配色: works with any style; also the colour filter in the style library.
+const STYLE_COLORS=[
+  {key:'red',label:'紅',hex:'#d6202f',text:'rich red with gold accents'},
+  {key:'orange',label:'橘',hex:'#f59e0b',text:'warm orange and gold'},
+  {key:'yellow',label:'金黃',hex:'#f2c14e',text:'warm golden yellow'},
+  {key:'pink',label:'粉',hex:'#f4a7b9',text:'soft pink and blush'},
+  {key:'green',label:'綠',hex:'#2f7d4f',text:'deep emerald green'},
+  {key:'teal',label:'藍綠',hex:'#2bb5a8',text:'fresh turquoise and teal'},
+  {key:'blue',label:'藍',hex:'#1d4ed8',text:'royal blue'},
+  {key:'purple',label:'紫',hex:'#5b3fa8',text:'deep purple and indigo'},
+  {key:'black',label:'黑金',hex:'#16161a',text:'black with gold accents'},
+  {key:'white',label:'白灰',hex:'#e5e7eb',text:'white and light grey'},
+  {key:'beige',label:'米',hex:'#e8d6b8',text:'warm beige and cream'}
+];
+const PODIUM_OPTIONS=[{key:'auto',label:'依風格'},{key:'none',label:'不加'},{key:'round',label:'圓形'},{key:'square',label:'方形'},{key:'steps',label:'階梯'}];
+const PODIUM_TEXT={round:'a wide, low round podium',square:'a wide, low rectangular podium block',steps:'a low two-level stepped podium'};
+let sceneColor='';       // '' = the style's own colours
+let scenePodium='auto';  // 'auto' = the style's default podium (STYLE_META.p, else none)
+function effectivePodium(){
+  if(scenePodium!=='auto')return scenePodium;
+  const key=(scenes[selectedScene]||scenes[0])[0];
+  return (STYLE_META[key]&&STYLE_META[key].p)||'none';
+}
+// Photo thumbnails in 場景縮圖/<名稱>.<ext> (the newer styles use 480×240 JPG crops of reference banners).
+// The drawn colour preview in SCENE_THUMB_DRAWN sits behind a photo as a fallback in case the file is missing.
 const SCENE_THUMB_PHOTOS=new Map([
   ...['white','beige','clean','window','gradient','season','tech','dark','lucky'].map(k=>[k,'png']),
-  ...['silk','sunlight','party','redgold','oriental','moon','beach','underwater','autumn','winter','doodle','collage'].map(k=>[k,'jpg'])
+  ...['silk','sunlight','party','redgold','oriental','moon','beach','underwater','autumn','winter','doodle','collage',
+      'neonpodium','glasspodium','speed','blackgold','romance','lantern','seaterrace','storybook','comic','travel'].map(k=>[k,'jpg'])
 ]);
 const SCENE_THUMB_DRAWN={
   silk:'radial-gradient(ellipse at 62% 22%,rgba(190,215,255,.95),transparent 42%),repeating-linear-gradient(100deg,rgba(255,255,255,.10) 0 7px,transparent 7px 18px),linear-gradient(160deg,#0a1a63,#1d4ed8 70%,#0b1f6e)',
@@ -1641,43 +1767,132 @@ const lights=[
 ];
 let luckyStyleCache='';
 
-function sceneInFilter(key){
-  if(sceneFilter==='all'||key==='lucky'||key==='custom')return true;
-  return (SCENE_GROUPS.find(g=>g.key===sceneFilter)?.scenes||[]).includes(key);
+// ---- 背景風格：目前選擇、收藏／最近用過、配色、展台，以及「背景風格庫」視窗 ----
+// The left panel stays short no matter how many styles exist; the full list lives in the library window,
+// which has search, categories, a colour filter, favourites and recently used.
+const STYLE_FAV_KEY='freelyStyleFav_v1', STYLE_RECENT_KEY='freelyStyleRecent_v1';
+function readStyleKeys(k){try{const v=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(v)?v.filter(x=>STYLE_META[x]):[];}catch(e){return [];}}
+function writeStyleKeys(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+let styleFavs=readStyleKeys(STYLE_FAV_KEY), styleRecent=readStyleKeys(STYLE_RECENT_KEY);
+let styleLibTab='all', styleLibColor='', styleLibQuery='';
+function sceneByKey(k){return scenes.find(s=>s[0]===k);}
+function styleGroupLabel(key){const g=STYLE_GROUPS.find(x=>x.key===(STYLE_META[key]||{}).g);return g?g.label:'其他';}
+function sceneThumbHtml(s,cls=''){
+  if(s[2]==='custom')return `<div class="thumb custom ${cls}"></div>`;
+  if(SCENE_THUMB_PHOTOS.has(s[0])){
+    const imgPath=`./場景縮圖/${s[1]}.${SCENE_THUMB_PHOTOS.get(s[0])}`+(s[0]==='lucky'?'?v=2':'');
+    const drawn=SCENE_THUMB_DRAWN[s[0]];
+    const bg=drawn?`background:url('${imgPath}') center/cover no-repeat,${drawn}`:`background-image:url('${imgPath}')`;
+    return `<div class="thumb sceneImg ${s[0]} ${cls}" style="${bg}"></div>`;
+  }
+  return `<div class="thumb sceneImg drawn ${cls}" style="background:${SCENE_THUMB_DRAWN[s[0]]||'#252b39'}"></div>`;
 }
-// Used by the style cards and by the phone wizard (which has its own, shorter list).
+function toggleStyleFav(key){
+  styleFavs=styleFavs.includes(key)?styleFavs.filter(k=>k!==key):[key,...styleFavs];
+  writeStyleKeys(STYLE_FAV_KEY,styleFavs);renderStyleSelection();renderStyleLib();
+}
+// Used by the style cards, the style library and the phone wizard (which has its own, shorter list).
 function selectSceneByKey(key){
   const i=scenes.findIndex(s=>s[0]===key);if(i<0)return;
   selectedScene=i;if(key==='lucky')luckyStyleCache='';
+  styleRecent=[key,...styleRecent.filter(k=>k!==key)].slice(0,8);writeStyleKeys(STYLE_RECENT_KEY,styleRecent);
   renderCards();updateCustomVisibility();leftChanged();
 }
-function renderCards(){
-  const filterEl=document.getElementById('sceneFilter');
-  if(filterEl){
-    filterEl.innerHTML=SCENE_GROUPS.map(g=>{
-      const n=g.scenes?g.scenes.length:scenes.length-2;
-      return `<button type="button" class="sceneFilterBtn${g.key===sceneFilter?' on':''}" data-filter="${g.key}">${g.label}<span>${n}</span></button>`;
-    }).join('');
-    filterEl.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{sceneFilter=b.dataset.filter;renderCards();});
+function renderStyleSelection(){
+  const cur=scenes[selectedScene]||scenes[0], key=cur[0], fav=styleFavs.includes(key);
+  const curEl=document.getElementById('styleCurrent');
+  if(curEl){
+    curEl.innerHTML=sceneThumbHtml(cur,'styleCurThumb')+
+      `<div class="styleCurInfo">
+        <div class="styleCurName">${cur[1]}<button type="button" class="styleFavBtn${fav?' on':''}" data-fav="${key}" title="${fav?'取消收藏':'加入收藏'}" aria-pressed="${fav}">${fav?'★':'☆'}</button></div>
+        <div class="styleCurDesc">${styleGroupLabel(key)}・${cur[3]}</div>
+        <button type="button" class="styleOpenBtn">瀏覽全部風格（${scenes.length}）</button>
+      </div>`;
+    curEl.querySelector('[data-fav]').onclick=e=>{e.stopPropagation();toggleStyleFav(key);};
+    curEl.querySelector('.styleOpenBtn').onclick=openStyleLib;
+    curEl.querySelector('.styleCurThumb').onclick=openStyleLib;
   }
-  const cur=scenes[selectedScene]||scenes[0];
-  const pickedEl=document.getElementById('scenePicked');
-  if(pickedEl)pickedEl.innerHTML=sceneInFilter(cur[0])?'':`目前選的是：<b>${cur[1]}</b>（在其他分類）`;
-  sceneGrid.innerHTML=scenes.map((s,i)=>({s,i})).filter(({s})=>sceneInFilter(s[0])).map(({s,i},n)=>{
-    let thumbHtml;
-    if(s[2]==='custom'){
-      thumbHtml = `<div class="thumb custom"></div>`;
-    } else if(SCENE_THUMB_PHOTOS.has(s[0])){
-      const imgPath = `./場景縮圖/${s[1]}.${SCENE_THUMB_PHOTOS.get(s[0])}`+(s[0]==='lucky'?'?v=2':'');
-      const drawn = SCENE_THUMB_DRAWN[s[0]];
-      const bgStyle = drawn ? `background:url('${imgPath}') center/cover no-repeat,${drawn}` : `background-image:url('${imgPath}')`;
-      thumbHtml = `<div class="thumb sceneImg ${s[0]}" style="${bgStyle}"></div>`;
-    } else {
-      thumbHtml = `<div class="thumb sceneImg drawn" style="background:${SCENE_THUMB_DRAWN[s[0]]||'#252b39'}"></div>`;
-    }
-    const riskBadge = s[4] ? `<div style="margin-top:4px;font-size:10px;font-weight:900;letter-spacing:.2px;color:${s[4].startsWith('⚠')?'#ff8a8a':'#7cf0bd'}">${s[4]}</div>` : '';
-    return `<div class="optionCard ${i===selectedScene?'active':''}" data-type="scene" data-i="${i}">${thumbHtml}<div class="optionTitle">${n+1}. ${s[1]}</div><div class="optionDesc">${s[3]}</div>${riskBadge}</div>`;
-  }).join('');
+  const quick=[...styleFavs,...styleRecent].filter((k,i,a)=>a.indexOf(k)===i&&k!==key&&sceneByKey(k)).slice(0,6);
+  const qEl=document.getElementById('styleQuick');
+  if(qEl){
+    qEl.innerHTML=quick.length?'<div class="styleQuickLabel">收藏與最近用過</div><div class="styleQuickRow">'+quick.map(k=>{
+      const s=sceneByKey(k);return `<button type="button" class="styleQuickItem" data-k="${k}" title="${s[1]}">${sceneThumbHtml(s)}<span>${styleFavs.includes(k)?'★ ':''}${s[1]}</span></button>`;
+    }).join('')+'</div>':'';
+    qEl.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>selectSceneByKey(b.dataset.k));
+  }
+  const colEl=document.getElementById('sceneColorRow');
+  if(colEl){
+    colEl.innerHTML=`<button type="button" class="colorDot auto${sceneColor?'':' on'}" data-color="" title="使用風格原本的顏色">原色</button>`+
+      STYLE_COLORS.map(c=>`<button type="button" class="colorDot${sceneColor===c.key?' on':''}" data-color="${c.key}" title="${c.label}" style="--dot:${c.hex}"><i></i>${c.label}</button>`).join('');
+    colEl.querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>{sceneColor=b.dataset.color;renderStyleSelection();leftChanged();});
+  }
+  const podEl=document.getElementById('podiumRow');
+  if(podEl){
+    const def=(STYLE_META[key]&&STYLE_META[key].p)||'none', defLabel=PODIUM_OPTIONS.find(o=>o.key===def).label;
+    podEl.innerHTML=PODIUM_OPTIONS.map(o=>`<button type="button" class="podiumBtn${scenePodium===o.key?' on':''}" data-podium="${o.key}">${o.key==='auto'?'依風格（'+defLabel+'）':o.label}</button>`).join('');
+    podEl.querySelectorAll('[data-podium]').forEach(b=>b.onclick=()=>{scenePodium=b.dataset.podium;renderStyleSelection();leftChanged();});
+  }
+}
+// ---- 背景風格庫視窗 ----
+const STYLE_LIB_TABS=()=>[{key:'all',label:'全部',n:scenes.length},{key:'fav',label:'★ 收藏',n:styleFavs.length},{key:'recent',label:'最近',n:styleRecent.length},
+  ...STYLE_GROUPS.map(g=>({key:g.key,label:g.label,n:scenes.filter(s=>(STYLE_META[s[0]]||{}).g===g.key).length}))];
+function styleMatches(s){
+  const key=s[0], m=STYLE_META[key]||{c:[],t:''}, special=key==='lucky'||key==='custom';
+  if(styleLibTab==='fav'&&!styleFavs.includes(key))return false;
+  if(styleLibTab==='recent'&&!styleRecent.includes(key))return false;
+  if(!['all','fav','recent'].includes(styleLibTab)&&m.g!==styleLibTab&&!special)return false;
+  if(styleLibColor&&!special&&!(m.c||[]).includes(styleLibColor))return false;
+  const q=styleLibQuery.trim().toLowerCase();
+  if(q){
+    const hay=[s[1],s[3],m.t,styleGroupLabel(key),...(m.c||[]).map(c=>(STYLE_COLORS.find(x=>x.key===c)||{}).label||'')].join(' ').toLowerCase();
+    if(!q.split(/\s+/).every(w=>hay.includes(w)))return false;
+  }
+  return true;
+}
+function renderStyleLib(){
+  const lib=document.getElementById('styleLib');if(!lib||lib.hidden)return;
+  const tabs=document.getElementById('styleLibTabs');
+  tabs.innerHTML=STYLE_LIB_TABS().map(t=>`<button type="button" role="tab" class="styleLibTab${t.key===styleLibTab?' on':''}" data-tab="${t.key}" aria-selected="${t.key===styleLibTab}">${t.label}<span>${t.n}</span></button>`).join('');
+  tabs.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{styleLibTab=b.dataset.tab;renderStyleLib();});
+  const cols=document.getElementById('styleLibColors');
+  cols.innerHTML='<span class="styleLibColorsLabel">色系</span>'+STYLE_COLORS.map(c=>`<button type="button" class="colorDot${styleLibColor===c.key?' on':''}" data-filter-color="${c.key}" style="--dot:${c.hex}" title="只看${c.label}色系"><i></i>${c.label}</button>`).join('');
+  cols.querySelectorAll('[data-filter-color]').forEach(b=>b.onclick=()=>{styleLibColor=styleLibColor===b.dataset.filterColor?'':b.dataset.filterColor;renderStyleLib();});
+  let list=scenes.filter(styleMatches);
+  const orderBy=arr=>list.sort((a,b)=>{const ia=arr.indexOf(a[0]),ib=arr.indexOf(b[0]);return (ia<0?99:ia)-(ib<0?99:ib);});
+  if(styleLibTab==='fav')orderBy(styleFavs);else if(styleLibTab==='recent')orderBy(styleRecent);
+  const grid=document.getElementById('styleLibGrid'), curKey=(scenes[selectedScene]||scenes[0])[0];
+  grid.innerHTML=list.length?list.map(s=>{
+    const key=s[0], m=STYLE_META[key]||{c:[]}, fav=styleFavs.includes(key);
+    const dots=(m.c||[]).map(c=>{const col=STYLE_COLORS.find(x=>x.key===c);return col?`<i style="background:${col.hex}" title="${col.label}"></i>`:'';}).join('');
+    return `<div class="styleCard${key===curKey?' active':''}" data-k="${key}" role="button" tabindex="0" aria-label="${s[1]}">
+      ${sceneThumbHtml(s)}
+      <button type="button" class="styleFavBtn${fav?' on':''}" data-fav="${key}" title="${fav?'取消收藏':'加入收藏'}" aria-pressed="${fav}">${fav?'★':'☆'}</button>
+      <div class="styleCardName">${s[1]}</div>
+      <div class="styleCardDesc">${s[3]}</div>
+      <div class="styleCardMeta"><span>${styleGroupLabel(key)}${m.p?'・附展台':''}</span><span class="styleCardDots">${dots}</span></div>
+    </div>`;
+  }).join(''):`<div class="styleLibEmpty">沒有符合的風格。<button type="button" id="styleLibReset">清除搜尋與篩選</button></div>`;
+  grid.querySelectorAll('.styleCard').forEach(card=>{
+    const pick=()=>{selectSceneByKey(card.dataset.k);closeStyleLib();};
+    card.onclick=e=>{if(e.target.closest('[data-fav]'))return;pick();};
+    card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}};
+  });
+  grid.querySelectorAll('[data-fav]').forEach(b=>b.onclick=e=>{e.stopPropagation();toggleStyleFav(b.dataset.fav);});
+  const reset=document.getElementById('styleLibReset');
+  if(reset)reset.onclick=()=>{styleLibTab='all';styleLibColor='';styleLibQuery='';document.getElementById('styleSearch').value='';renderStyleLib();};
+}
+function openStyleLib(){
+  const lib=document.getElementById('styleLib');if(!lib)return;
+  lib.hidden=false;renderStyleLib();
+  setTimeout(()=>document.getElementById('styleSearch')?.focus(),0);
+}
+function closeStyleLib(){const lib=document.getElementById('styleLib');if(lib)lib.hidden=true;}
+document.getElementById('styleLibClose')?.addEventListener('click',closeStyleLib);
+document.getElementById('styleLib')?.addEventListener('click',e=>{if(e.target.id==='styleLib')closeStyleLib();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('styleLib')?.hidden)closeStyleLib();});
+document.getElementById('styleSearch')?.addEventListener('input',e=>{styleLibQuery=e.target.value;renderStyleLib();});
+function renderCards(){
+  renderStyleSelection();
   purposeGrid.innerHTML=purposes.map((s,i)=>`<div class="optionCard ${i===selectedPurpose?'active':''}" data-type="purpose" data-i="${i}"><div class="thumb ${s[0]}${PURPOSE_ILLUS[s[0]]?' illus':''}">${PURPOSE_ILLUS[s[0]]||''}</div><div class="optionTitle">${i+1}. ${s[1]}</div><div class="optionDesc">${s[3]}</div><div style="margin-top:6px;font-size:10px;color:#8dd3ff;font-weight:700;letter-spacing:.3px">VISUAL STYLE PREVIEW</div></div>`).join('');
   lightGrid.innerHTML=lights.map((l,i)=>`<div class="lightChip ${l[3]?'on':''}" data-i="${i}"><div class="lightIcon ${l[0]}"></div><div class="lightTxt">${l[1]}</div></div>`).join('');
   document.querySelectorAll('.optionCard').forEach(c=>c.onclick=()=>{ if(c.dataset.type==='scene'){ selectSceneByKey(scenes[+c.dataset.i][0]); return; } selectedPurpose=+c.dataset.i; renderCards(); updateCustomVisibility(); leftChanged(); });
@@ -1775,9 +1990,12 @@ function buildLuckyPrompt(){
 }
 function getSceneText(){
   const scene=scenes[selectedScene]||scenes[0];
-  if(scene[2]==='LUCKY_RANDOM_STYLE') return buildLuckyPrompt();
-  if(scene[2]==='custom') return scopedNotes(customScene.value,'Custom background notes')||'Neutral studio background.';
-  return scene[2];
+  const base=scene[2]==='LUCKY_RANDOM_STYLE' ? buildLuckyPrompt()
+    : scene[2]==='custom' ? (scopedNotes(customScene.value,'Custom background notes')||'Neutral studio background.')
+    : scene[2];
+  // 配色: the same composition in another colour, instead of a separate style per colour.
+  const col=STYLE_COLORS.find(c=>c.key===sceneColor);
+  return col ? base+' Colour scheme: '+col.text+' — use this instead of any colours named above.' : base;
 }
 function getPurposeText(){
   const purpose=purposes[selectedPurpose]||purposes[0];
@@ -2872,7 +3090,7 @@ function buildCompositePrompt(snapshot=getLayoutSnapshot()){
     'Edit the attached photo: replace ONLY the plain white background. Everything that is not white background — '+(many?'the '+n+' products':'the product')+' — must stay exactly as it is.',
     'FRAMING — KEEP IT IDENTICAL: same camera position, same viewing angle, same zoom and the same '+ratio+' aspect ratio as the attached photo. '+(many?'The products are':'The product is')+' deliberately small and centred: '+(many?'together they span':'it spans')+' about '+z.left+'%–'+z.right+'% of the image width and '+z.top+'%–'+z.bottom+'% of the image height (about '+(z.bottom-z.top)+'% of the height), and must cover exactly the same area in the result. No zoom in, no zoom out, no crop, no pan, no tilt, no new perspective.',
     (many?'PRODUCTS, left to right: ':'PRODUCT: ')+aiProductList(snapshot)+'. Keep '+(many?'each one':'it')+' exactly as in the photo: same position, same size, same angle, same shape, same colours, same printed text and logos'+(many?', same overlap':'')+'. Do not redraw, rotate, enlarge, shrink, straighten, retouch or relight '+it+', and do not add lights, LEDs, glows, highlights, reflections or any new detail onto '+it+'. Exactly '+n+' product'+(many?'s':'')+', no more and no fewer.',
-    'NEW BACKGROUND: '+getSceneText()+' Decoration: '+getPurposeText()+' The floor or tabletop reaches '+(many?'each product exactly where it already stands; products standing at different heights in the picture is depth — the floor comes to them, they never move to the floor.':'the product exactly where it already stands — the floor comes to it, it never moves to the floor.')+(look?' '+look:'')+' Light the background from '+KEY_LIGHT_TEXT[keyLightValue()].replace(/^from /,'')+' so it matches the light already on '+them+'; shadows and reflections belong to the background and never cover printed text or logos.',
+    'NEW BACKGROUND: '+getSceneText()+' Decoration: '+getPurposeText()+' The floor or tabletop reaches '+(many?'each product exactly where it already stands; products standing at different heights in the picture is depth — the floor comes to them, they never move to the floor.':'the product exactly where it already stands — the floor comes to it, it never moves to the floor.')+podiumAiText(many,them,it)+(look?' '+look:'')+' Light the background from '+KEY_LIGHT_TEXT[keyLightValue()].replace(/^from /,'')+' so it matches the light already on '+them+'; shadows and reflections belong to the background and never cover printed text or logos.',
     'Decorations only in empty areas, never in front of, overlapping or touching a product. No text, watermarks, frames, boxes, labels or guide lines.',
     getStyleRefText(),
     extra?'EXTRA RULES (these can only restrict, never permit product changes): '+extra:'',
@@ -2892,9 +3110,16 @@ function productZone(snapshot){
 // describing the product area as a rectangular "zone"/"surface"/"backdrop", or talking about products,
 // made image models draw a blank board, panel or paper sweep to mark the spot. So this prompt describes
 // an ordinary scene whose middle is simply open, and explicitly forbids anything that marks that area.
+// 展台 in the AI-mode prompt: the podium is built to where the products already stand, never the reverse.
+function podiumAiText(many,them,it){
+  const p=effectivePodium();if(p==='none'||!PODIUM_TEXT[p])return '';
+  return ' Put '+PODIUM_TEXT[p]+' under '+them+': its flat top surface is exactly where '+(many?'the products already stand':'the product already stands')+
+    ', a little wider than '+(many?'the group':'the product')+'. Build the podium to fit '+them+' — never move, lift, shrink or tilt '+it+' to fit the podium.'+
+    (many&&p==='steps'?' If the products stand at different heights, give the podium one level for each height.':'');
+}
 function genBackgroundPrompt(snapshot=getLayoutSnapshot()){
   if(!snapshot.products.length)return '請先上傳商品並在中間編輯器完成排版，再複製背景咒語。';
-  const z=productZone(snapshot),wallLine=Math.max(z.top,z.bottom-8);
+  const z=productZone(snapshot),wallLine=Math.max(z.top,z.bottom-8),pod=effectivePodium(),hasPodium=pod!=='none'&&!!PODIUM_TEXT[pod];
   const view={
     'front-facing eye-level composition':'eye level, looking straight ahead',
     'slightly low angle hero composition':'slightly below eye level',
@@ -2909,9 +3134,13 @@ function genBackgroundPrompt(snapshot=getLayoutSnapshot()){
      'Camera: '+lens.value+', '+view+'.',
      'Lighting: soft key light '+KEY_LIGHT_TEXT[keyLightValue()]+', with smooth, natural falloff across the whole scene.'+(on('dof')?' The far background is gently out of focus.':''),
      getStyleRefText()].filter(Boolean).join('\n'),
-    'KEEP THE MIDDLE OPEN: the products will later stand in the area from '+z.left+'% to '+z.right+'% of the width and '+z.top+'% to '+z.bottom+'% of the height (measured from the top-left), resting on the floor at about '+z.bottom+'% of the height. In that area show only the same floor and back wall that surround it — same colour, texture and light, nothing added. Place any decorations near the edges and corners of the frame, outside that area.',
-    'FLOOR: the floor or tabletop runs from the bottom edge of the picture back past the '+z.bottom+'% line. If the back wall meets the floor in a visible line, that line sits higher than '+wallLine+'% of the height, behind where the products will stand; a soft gradual transition is also fine.',
-    'DO NOT DRAW: any product, bottle, jar, box, device or package; people or hands; text, logos, labels or watermarks. Nothing that marks the empty area: no blank board, panel, card, poster, sign, screen, picture frame, canvas, backdrop stand, paper roll with visible edges, plinth, pedestal, podium, platform, step, outline or rectangle. No shadows shaped like products.'
+    hasPodium
+      ? 'PODIUM: '+PODIUM_TEXT[pod].replace(/^a /,'A ')+' stands in the middle. Its flat top surface is at about '+z.bottom+'% of the image height and spans about '+Math.max(0,z.left-6)+'%–'+Math.min(100,z.right+6)+'% of the width (measured from the top-left); the products will be placed standing on it later, so keep that top surface plain, empty and evenly lit. Above the podium, the area from '+z.left+'% to '+z.right+'% of the width and '+z.top+'% to '+z.bottom+'% of the height stays open backdrop. Place decorations only near the edges and corners of the frame, never on the podium.'
+      : 'KEEP THE MIDDLE OPEN: the products will later stand in the area from '+z.left+'% to '+z.right+'% of the width and '+z.top+'% to '+z.bottom+'% of the height (measured from the top-left), resting on the floor at about '+z.bottom+'% of the height. In that area show only the same floor and back wall that surround it — same colour, texture and light, nothing added. Place any decorations near the edges and corners of the frame, outside that area.',
+    hasPodium
+      ? 'FLOOR: the podium stands on the floor of the scene, which runs to the bottom edge of the picture; any back wall meets the floor behind the podium.'
+      : 'FLOOR: the floor or tabletop runs from the bottom edge of the picture back past the '+z.bottom+'% line. If the back wall meets the floor in a visible line, that line sits higher than '+wallLine+'% of the height, behind where the products will stand; a soft gradual transition is also fine.',
+    'DO NOT DRAW: any product, bottle, jar, box, device or package; people or hands; text, logos, labels or watermarks. Nothing that marks the empty area: no blank board, panel, card, poster, sign, screen, picture frame, canvas, backdrop stand, paper roll with visible edges, '+(hasPodium?'':'plinth, pedestal, podium, platform, step, ')+'outline or rectangle. No shadows shaped like products.'
   ].join('\n\n');
 }
 function genCompositePrompt(){return buildCompositePrompt();}
@@ -3781,7 +4010,7 @@ function getLayoutState(){
   const styleImg=document.getElementById('styleRefPreviewImg');
   const styleRefData=location.hash==='#2'&&styleRefFile&&styleImg?.complete&&styleImg.naturalWidth?imagePNG(styleImg):'';
   return {version:'2.0',savedAt:new Date().toISOString(),selectedCanvasRatio,selectedScene,selectedPurpose,
-    sceneKey:(scenes[selectedScene]||scenes[0])[0],purposeKey:(purposes[selectedPurpose]||purposes[0])[0],
+    sceneKey:(scenes[selectedScene]||scenes[0])[0],sceneColor,scenePodium,purposeKey:(purposes[selectedPurpose]||purposes[0])[0],
     customScene:customScene.value,customPurpose:customPurpose.value,lens:lens.value,angle:angle.value,lock:lock.value,
     lights:lights.map(l=>l[3]),keyLight:keyLightValue(),
     shadow:Object.fromEntries(SHADOW_SLIDERS.map(([k,id])=>[k,Number(document.getElementById(id)?.value)||0])),
@@ -3817,6 +4046,8 @@ async function restoreLayoutState(data){
   const sceneKey=typeof data.sceneKey==='string'?data.sceneKey:Number.isInteger(data.selectedScene)?OLD_SCENE_ORDER[data.selectedScene]:'';
   const sceneIdx=scenes.findIndex(s=>s[0]===sceneKey);
   selectedScene=sceneIdx>=0?sceneIdx:0;
+  sceneColor=STYLE_COLORS.some(c=>c.key===data.sceneColor)?data.sceneColor:'';
+  scenePodium=PODIUM_OPTIONS.some(o=>o.key===data.scenePodium)?data.scenePodium:'auto';
   // Restore by key: the option order changed (豐富 now first). Older files only have the index in the old order.
   const OLD_PURPOSE_ORDER=['minimal','rich','random','custom'];
   const purposeKey=typeof data.purposeKey==='string'?data.purposeKey:Number.isInteger(data.selectedPurpose)?OLD_PURPOSE_ORDER[data.selectedPurpose]:'';
